@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -30,7 +31,6 @@ var rootCmd = &cobra.Command{
 	Use:   "paperless-cli",
 	Short: "A CLI to interact with a paperless instance's API.",
 	Long: `This is a cli for paperless which is a document management platform for your papers and other files.
-
 This tool will help list and manage your tags, correspondents, and documents via paperless' API.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -82,5 +82,10 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		if v := viper.Get("use_https"); v != false {
+			log.Printf("Hostname: https://%v, Port: %v, API root: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+		} else {
+			log.Printf("Hostname: http://%v, Port: %v, API root: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+		}
 	}
 }

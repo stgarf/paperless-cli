@@ -1,0 +1,10 @@
+# A basic paperless-cli configuration file.
+
+# The hostname of the Paperless instance.
+hostname: localhost
+# Connect via HTTP or HTTPS.
+use_https: false
+# Port the Paperless instance is listening on.
+port: 8000
+# Path to the API root.
+root: /api
