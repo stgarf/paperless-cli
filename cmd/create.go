@@ -34,6 +34,10 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		replace, _ := cmd.Flags().GetBool("replace")
+		if debugFlag {
+			log.Printf("DEBUG: Called 'create' with args %v, replace: %v\n", args, replace)
+		}
 		if cfgFile == "" {
 			home, _ := homedir.Dir()
 			cfgFile = home + "/.paperless-cli.yaml"
@@ -44,13 +48,22 @@ to quickly create a Cobra application.`,
 		viper.Set("port", 8000)
 		viper.Set("root", "/api")
 		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
+			if debugFlag {
+				log.Println("DEBUG: Checking if a configuration exists")
+			}
 			if os.IsNotExist(err) {
-				err = viper.WriteConfigAs(cfgFile)
-			} else if replace, err := cmd.Flags().GetBool("replace"); err == nil && replace {
-				log.Println("Replacing existing configuration at:", cfgFile)
-				err = viper.WriteConfigAs(cfgFile)
+				viper.WriteConfigAs(cfgFile)
+			} else if replace {
+				if debugFlag {
+					log.Println("DEBUG: Replacing existing configuration at:", cfgFile)
+				}
+				log.Println("Replaced existing configuration")
+				viper.WriteConfigAs(cfgFile)
 			} else {
-				log.Fatalln("A configuration exists -- refusing to replace. Check flags in 'help config create'.")
+				if debugFlag {
+					log.Println("DEBUG: Configuration file already exists")
+				}
+				log.Fatalln("A configuration exists -- refusing to replace. Check flags in 'help config create'")
 			}
 		}
 	},
