@@ -25,12 +25,14 @@ import (
 )
 
 var cfgFile string
+var debugFlag bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "paperless-cli",
 	Short: "A CLI to interact with a paperless instance's API.",
-	Long: `This is a cli for paperless which is a document management platform for your papers and other files.
+	Long: `This is a CLI for Paperless -- a document management platform for your papers and other files.
+
 This tool will help list and manage your tags, correspondents, and documents via paperless' API.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -56,7 +58,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("debug", "d", false, "Toggle debug logging output.")
+	rootCmd.PersistentFlags().BoolVarP(&debugFlag, "debug", "d", false, "Toggle debug log output")
 }
 
 // initConfig reads in config file and ENV variables if set.
