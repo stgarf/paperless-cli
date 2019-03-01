@@ -15,9 +15,12 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"os"
 
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // createCmd represents the create command
@@ -31,20 +34,29 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
+		if cfgFile == "" {
+			home, _ := homedir.Dir()
+			cfgFile = home + "/.paperless-cli.yaml"
+		}
+		// create a new configuration
+		viper.Set("hostname", "localhost")
+		viper.Set("use_https", false)
+		viper.Set("port", 8000)
+		viper.Set("root", "/api")
+		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
+			if os.IsNotExist(err) {
+				err = viper.WriteConfigAs(cfgFile)
+			} else if replace, err := cmd.Flags().GetBool("replace"); err == nil && replace {
+				log.Println("Replacing existing configuration at:", cfgFile)
+				err = viper.WriteConfigAs(cfgFile)
+			} else {
+				log.Fatalln("A configuration exists -- refusing to replace. Check flags in 'help config create'.")
+			}
+		}
 	},
 }
 
 func init() {
 	configCmd.AddCommand(createCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	createCmd.Flags().BoolP("replace", "r", false, "Replace/delete an existing .paperless-cli.yaml")
 }
