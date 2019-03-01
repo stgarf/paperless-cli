@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -23,14 +24,14 @@ import (
 // tagsCmd represents the tags command
 var tagsCmd = &cobra.Command{
 	Use:   "tags",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Manage tags of Paperless instance",
+	Long: `Manage tags of Paperless instance.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Some examples might be adding, viewing, editing, and deleting tags.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if debugFlag {
+			log.Printf("DEBUG: Called 'tags' with args %v\n", args)
+		}
 		fmt.Println("tags called")
 	},
 }

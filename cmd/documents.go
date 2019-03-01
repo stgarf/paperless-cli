@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -23,14 +24,14 @@ import (
 // documentsCmd represents the documents command
 var documentsCmd = &cobra.Command{
 	Use:   "documents",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Manage documents of Paperless instance",
+	Long: `Manage documents of Paperless instance.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+This includes creating, viewing, editing, and deleting documents in Paperless.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if debugFlag {
+			log.Printf("DEBUG: Called 'documents' with args %v\n", args)
+		}
 		fmt.Println("documents called")
 	},
 }
