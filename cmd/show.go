@@ -29,6 +29,9 @@ var showCmd = &cobra.Command{
 	
 The configuration displayed will change based on the --config flag.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if debugFlag {
+			log.Printf("DEBUG: Called 'show' with args %v\n", args)
+		}
 		if len(args) > 0 {
 			log.Printf("Command takes no args, ignoring: %v\n", args)
 		}
