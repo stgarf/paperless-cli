@@ -15,9 +15,10 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // showCmd represents the show command
@@ -31,7 +32,12 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("show called")
+		log.Println("Showing current configuration:")
+		if v := viper.Get("use_https"); v != false {
+			log.Printf("Hostname: https://%v, Port: %v, API root: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+		} else {
+			log.Printf("Hostname: http://%v, Port: %v, API root: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+		}
 	},
 }
 
