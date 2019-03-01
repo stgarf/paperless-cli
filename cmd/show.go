@@ -24,33 +24,28 @@ import (
 // showCmd represents the show command
 var showCmd = &cobra.Command{
 	Use:   "show",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Show the current configuration",
+	Long: `Shows the current configuration file for paperless-cli.
+	
+The configuration displayed will change based on the --config flag.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println("Showing current configuration:")
-		if v := viper.Get("use_https"); v != false {
-			log.Printf("Hostname: https://%v, Port: %v, API root: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+		if len(args) > 0 {
+			log.Printf("Command takes no args, ignoring: %v\n", args)
+		}
+		if viper.ConfigFileUsed() == "" {
+			log.Println("No configuration file found! Try 'config create'")
 		} else {
-			log.Printf("Hostname: http://%v, Port: %v, API root: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+			log.Printf("Configuration file: %v\n", viper.ConfigFileUsed())
+			log.Printf("Hostname: %v, Port: %v, API root: %v, HTTPS: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"), viper.Get("use_https"))
+			if v := viper.Get("use_https"); v != false {
+				log.Printf("Connection URL: https://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+			} else {
+				log.Printf("Connection URL: http://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+			}
 		}
 	},
 }
 
 func init() {
 	configCmd.AddCommand(showCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// showCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
