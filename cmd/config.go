@@ -15,25 +15,19 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Manage the paperless-cli configuration file",
-	Long: `Create or show the paperless-cli configuration file.  Examples
-and usage of the  command:
+	Short: "Manage paperless-cli configuration file",
+	Long: `Create or show the paperless-cli configuration file.
+Examples and usage of the command:
 
 paperless-cli config create
 paperless-cli config show`,
-	Run: func(cmd *cobra.Command, args []string) {
-		f := cmd.Args
-		fmt.Println(f)
-		fmt.Println("config called")
-	},
+	//	Run: func(cmd *cobra.Command, args []string) { }
 }
 
 func init() {
