@@ -48,8 +48,12 @@ to quickly create a Cobra application.`,
 		viper.Set("use_https", false)
 		viper.Set("port", 8000)
 		viper.Set("root", "/api")
+
+		// Check for a config file
 		log.Debugf("Checking if a configuration exists at %v", cfgFile)
 		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
+			// TODO: (sgarf): See if this ever gets fixed.
+			// https://github.com/spf13/viper/issues/433#issuecomment-356483379
 			if os.IsNotExist(err) {
 				log.Debugf("No configuration file found at %v", cfgFile)
 				fmt.Println("No configuration exists. Creating...")
@@ -64,12 +68,10 @@ to quickly create a Cobra application.`,
 				log.Debug("Configuration file already exists")
 				fmt.Printf("A configuration exists at %v -- refusing to replace. Check flags in 'help config create'\n", cfgFile)
 				os.Exit(1)
-			} else {
-				if strings.Contains(err.Error(), "extension") {
-					fmt.Println(err.Error())
-				} else {
-					log.Fatalln(err)
-				}
+			} else if strings.Contains(err.Error(), "extension") || strings.Contains(err.Error(), "Unsupported") { // Catch extension error from viper
+				fmt.Println(err.Error())
+			} else { // Catch any other errors, what else could fail?
+				log.Fatalln(err)
 			}
 		}
 		log.Debug("Done calling 'create'")
