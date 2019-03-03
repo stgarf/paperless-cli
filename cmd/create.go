@@ -15,18 +15,21 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 	"os"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "A brief description of your command",
+	Use:     "create",
+	Aliases: []string{"c", "cr"},
+	Short:   "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -34,10 +37,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		replace, _ := cmd.Flags().GetBool("replace")
-		if debugFlag {
-			log.Printf("DEBUG: Called 'create' with args %v, replace: %v\n", args, replace)
-		}
+		//replace, _ := cmd.Flags().GetBool("replace")
+		log.Debugf("Called 'create' with args %v, replace: %v", args, replace)
 		if cfgFile == "" {
 			home, _ := homedir.Dir()
 			cfgFile = home + "/.paperless-cli.yaml"
@@ -47,25 +48,31 @@ to quickly create a Cobra application.`,
 		viper.Set("use_https", false)
 		viper.Set("port", 8000)
 		viper.Set("root", "/api")
+		log.Debugf("Checking if a configuration exists at %v", cfgFile)
 		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
-			if debugFlag {
-				log.Println("DEBUG: Checking if a configuration exists")
-			}
 			if os.IsNotExist(err) {
+				log.Debugf("No configuration file found at %v", cfgFile)
+				fmt.Println("No configuration exists. Creating...")
 				viper.WriteConfigAs(cfgFile)
-			} else if replace {
-				if debugFlag {
-					log.Println("DEBUG: Replacing existing configuration at:", cfgFile)
-				}
-				log.Println("Replaced existing configuration")
+				log.Debugf("Created new configuration at %v", cfgFile)
+				fmt.Println("A new configuration was created at", cfgFile)
+			} else if _, err2 := os.Stat(cfgFile); err2 == nil && replace {
+				log.Debugf("Replacing existing configuration at %v", cfgFile)
 				viper.WriteConfigAs(cfgFile)
+				fmt.Println("Replaced existing configuration")
+			} else if _, err2 := os.Stat(cfgFile); err2 == nil && !replace {
+				log.Debug("Configuration file already exists")
+				fmt.Printf("A configuration exists at %v -- refusing to replace. Check flags in 'help config create'\n", cfgFile)
+				os.Exit(1)
 			} else {
-				if debugFlag {
-					log.Println("DEBUG: Configuration file already exists")
+				if strings.Contains(err.Error(), "extension") {
+					fmt.Println(err.Error())
+				} else {
+					log.Fatalln(err)
 				}
-				log.Fatalln("A configuration exists -- refusing to replace. Check flags in 'help config create'")
 			}
 		}
+		log.Debug("Done calling 'create'")
 	},
 }
 
