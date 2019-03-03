@@ -16,10 +16,10 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -63,6 +63,17 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// Set log format
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: false,
+		DisableColors: true,
+	})
+
+	// Set DebugLevel if debugFlag
+	if debugFlag {
+		log.SetLevel(log.DebugLevel)
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -83,6 +94,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		log.Println("Using config file:", viper.ConfigFileUsed())
+		log.Debugln("Using config file:", viper.ConfigFileUsed())
 	}
 }
