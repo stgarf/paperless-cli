@@ -15,37 +15,38 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // showCmd represents the show command
 var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Show the current configuration",
+	Use:     "show",
+	Aliases: []string{"s", "sh"},
+	Short:   "Show the current configuration",
 	Long: `Shows the current configuration file for paperless-cli.
 	
 The configuration displayed will change based on the --config flag.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if debugFlag {
-			log.Printf("DEBUG: Called 'show' with args %v\n", args)
-		}
+		log.Debugf("Called 'show' with args %v", args)
 		if len(args) > 0 {
-			log.Printf("Command takes no args, ignoring: %v\n", args)
+			log.Debugf("Command takes no args, ignoring: %v", args)
 		}
 		if viper.ConfigFileUsed() == "" {
-			log.Println("No configuration file found! Try 'config create'")
+			fmt.Println("No configuration file found! Try 'config create'")
 		} else {
-			log.Printf("Configuration file: %v\n", viper.ConfigFileUsed())
-			log.Printf("Hostname: %v, Port: %v, API root: %v, HTTPS: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"), viper.Get("use_https"))
+			fmt.Printf("Configuration file: %v\n", viper.ConfigFileUsed())
+			fmt.Printf("Hostname: %v, Port: %v, API root: %v, HTTPS: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"), viper.Get("use_https"))
 			if v := viper.Get("use_https"); v != false {
-				log.Printf("Connection URL: https://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+				fmt.Printf("Connection URL: https://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
 			} else {
-				log.Printf("Connection URL: http://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
+				fmt.Printf("Connection URL: http://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
 			}
 		}
+		log.Debug("Done calling 'show'")
 	},
 }
 
