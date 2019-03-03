@@ -20,7 +20,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var GitSummary, Version string
+// GitSummary is populated during build time via ldflags
+var GitSummary string
+
+// Version is populated during build time via ldflags
+var Version string
 
 var versionCmd = &cobra.Command{
 	Use:     "version",
