@@ -18,17 +18,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:     "config",
 	Aliases: []string{"conf", "con"},
 	Short:   "Manage paperless-cli configuration file",
-	Long: `Create or show the paperless-cli configuration file.
-Examples and usage of the command:
-
-paperless-cli config create
-paperless-cli config show`,
-	//	Run: func(cmd *cobra.Command, args []string) { }
+	Long:    `Create or show the paperless-cli configuration file.`
 }
 
 func init() {
