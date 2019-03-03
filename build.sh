@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euf -o pipefail
 
-GOVVVBIN=$(which govvv)
-GOBIN=$(which go)
+GOVVVBIN=$(which govvv) || GOVVVBIN=${GOVVVBIN:=$GOPATH/bin/govvv}
+GOBIN=$(which go) || GOBIN=${GOBIN:=$GOROOT/bin/go}
 ECHOBIN=$(which echo)
 SEDBIN=$(which sed)
 
