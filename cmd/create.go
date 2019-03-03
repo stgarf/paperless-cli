@@ -26,6 +26,10 @@ import (
 )
 
 var replace bool
+var hostname string
+var port int
+var root string
+var useHTTPS bool
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
@@ -33,7 +37,6 @@ var createCmd = &cobra.Command{
 	Aliases: []string{"c", "cr"},
 	Short:   "Create a new configuration file",
 	Run: func(cmd *cobra.Command, args []string) {
-		//replace, _ := cmd.Flags().GetBool("replace")
 		log.Debugf("Called 'create' with args %v, replace: %v", args, replace)
 		if cfgFile == "" {
 			home, _ := homedir.Dir()
@@ -76,5 +79,9 @@ var createCmd = &cobra.Command{
 
 func init() {
 	configCmd.AddCommand(createCmd)
-	createCmd.Flags().BoolVarP(&replace, "replace", "r", false, "Replace/delete an existing .paperless-cli.yaml")
+	createCmd.Flags().BoolVarP(&replace, "replace", "r", false, "Replace/delete an existing configuration file")
+	createCmd.Flags().StringVar(&hostname, "hostname", "localhost", "Hostname to save to configuration")
+	createCmd.Flags().IntVar(&port, "port", 8000, "Hostname to save to configuration")
+	createCmd.Flags().StringVar(&root, "root", "/api", "Hostname to save to configuration")
+	createCmd.Flags().BoolVar(&useHTTPS, "https", false, "Use HTTPS")
 }
