@@ -16,22 +16,21 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 // correspondentsCmd represents the correspondents command
 var correspondentsCmd = &cobra.Command{
-	Use:   "correspondents",
-	Short: "Manage correspondents of Paperless instance",
+	Use:     "correspondents",
+	Aliases: []string{"correspondent", "correspond", "corr", "cor"},
+	Short:   "Manage correspondents of Paperless instance",
 	Long: `Manage correspondents of Paperless instance.
 
 This includes adding, viewing, editing, and deleting correspondents.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if debugFlag {
-			log.Printf("DEBUG: Called 'correspondents' with args %v\n", args)
-		}
+		log.Debugf("Called 'correspondents' with args %v", args)
 		fmt.Println("correspondents called")
 	},
 }

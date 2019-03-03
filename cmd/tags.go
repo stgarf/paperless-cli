@@ -16,22 +16,21 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 // tagsCmd represents the tags command
 var tagsCmd = &cobra.Command{
-	Use:   "tags",
-	Short: "Manage tags of Paperless instance",
+	Use:     "tags",
+	Aliases: []string{"tag", "t"},
+	Short:   "Manage tags of Paperless instance",
 	Long: `Manage tags of Paperless instance.
 
 Some examples might be adding, viewing, editing, and deleting tags.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if debugFlag {
-			log.Printf("DEBUG: Called 'tags' with args %v\n", args)
-		}
+		log.Debugf("Called 'tags' with args %v", args)
 		fmt.Println("tags called")
 	},
 }
