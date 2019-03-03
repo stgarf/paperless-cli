@@ -31,7 +31,6 @@ var port int
 var root string
 var useHTTPS bool
 
-// createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:     "create",
 	Aliases: []string{"c", "cr"},
@@ -53,23 +52,30 @@ var createCmd = &cobra.Command{
 		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
 			// TODO: (sgarf): See if this ever gets fixed.
 			// https://github.com/spf13/viper/issues/433#issuecomment-356483379
+
 			if os.IsNotExist(err) {
+				// File not found, create it
 				log.Debugf("No configuration file found at %v", cfgFile)
 				fmt.Println("No configuration exists. Creating...")
 				viper.WriteConfigAs(cfgFile)
 				log.Debugf("Created new configuration at %v", cfgFile)
 				fmt.Println("A new configuration was created at", cfgFile)
 			} else if _, err2 := os.Stat(cfgFile); err2 == nil && replace {
+				// File found and we've been told to replace it
 				log.Debugf("Replacing existing configuration at %v", cfgFile)
 				viper.WriteConfigAs(cfgFile)
 				fmt.Println("Replaced existing configuration")
 			} else if _, err2 := os.Stat(cfgFile); err2 == nil && !replace {
+				// File found but we're not allowed to delete it
 				log.Debug("Configuration file already exists")
 				fmt.Printf("A configuration exists at %v -- refusing to replace. Check flags in 'help config create'\n", cfgFile)
 				os.Exit(1)
 			} else if strings.Contains(err.Error(), "extension") || strings.Contains(err.Error(), "Unsupported") { // Catch extension error from viper
+				// Handle a fun extension handling error that's returned from viper
+				// when no or wrong extension provided
 				fmt.Println(err.Error())
-			} else { // Catch any other errors, what else could fail?
+			} else {
+				// Catch any other errors, what else could fail?
 				log.Fatalln(err)
 			}
 		}

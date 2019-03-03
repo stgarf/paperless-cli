@@ -22,22 +22,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-// showCmd represents the show command
 var showCmd = &cobra.Command{
 	Use:     "show",
 	Aliases: []string{"s", "sh"},
 	Short:   "Show the current configuration",
 	Long: `Shows the current configuration file for paperless-cli.
 	
-The configuration displayed will change based on the --config flag.`,
+The configuration displayed will change based on the value of the --config flag.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debugf("Called 'show' with args %v", args)
 		if len(args) > 0 {
 			log.Debugf("Command takes no args, ignoring: %v", args)
 		}
+		// If no config file found, suggest creation
 		if viper.ConfigFileUsed() == "" {
 			fmt.Println("No configuration file found! Try 'config create'")
 		} else {
+			// Display configuration information
 			fmt.Printf("Configuration file: %v\n", viper.ConfigFileUsed())
 			fmt.Printf("Hostname: %v, Port: %v, API root: %v, HTTPS: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"), viper.Get("use_https"))
 			if v := viper.Get("use_https"); v != false {

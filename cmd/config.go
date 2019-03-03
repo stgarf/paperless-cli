@@ -22,7 +22,7 @@ var configCmd = &cobra.Command{
 	Use:     "config",
 	Aliases: []string{"conf", "con"},
 	Short:   "Manage paperless-cli configuration file",
-	Long:    `Create or show the paperless-cli configuration file.`
+	Long:    `Create or show the paperless-cli configuration file.`,
 }
 
 func init() {

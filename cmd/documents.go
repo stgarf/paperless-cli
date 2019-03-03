@@ -21,14 +21,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// documentsCmd represents the documents command
 var documentsCmd = &cobra.Command{
 	Use:     "documents",
 	Aliases: []string{"document", "docs", "doc", "d"},
 	Short:   "Manage documents of Paperless instance",
-	Long: `Manage documents of Paperless instance.
-
-This includes creating, viewing, editing, and deleting documents in Paperless.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debugf("Called 'documents' with args %v", args)
 		fmt.Println("documents called")
@@ -37,14 +33,4 @@ This includes creating, viewing, editing, and deleting documents in Paperless.`,
 
 func init() {
 	rootCmd.AddCommand(documentsCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// documentsCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// documentsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
