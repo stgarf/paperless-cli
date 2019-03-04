@@ -16,6 +16,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/user"
 
 	"github.com/spf13/cobra"
 )
@@ -47,10 +49,24 @@ var versionCmd = &cobra.Command{
 	Aliases: []string{"vers", "ver", "v"},
 	Short:   "Output version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("paperless-cli v%v built on %v from git:%v-%v (%v)\n", Version, BuildDate, GitCommit, GitState, GitBranch)
+		fmt.Printf("paperless-cli v%v built on %v from git:%v-%v (%v) by %v@%v\n",
+			Version,
+			BuildDate,
+			GitCommit,
+			GitState,
+			GitBranch,
+			buildUser.Username,
+			buildHost,
+		)
 	},
 }
 
+var buildHost string
+var buildUser *user.User
+
 func init() {
+	buildHost, _ = os.Hostname()
+	buildUser, _ = user.Current()
+
 	rootCmd.AddCommand(versionCmd)
 }
