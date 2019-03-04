@@ -19,6 +19,7 @@ import (
 	"os"
 	"os/user"
 
+	fqdn "github.com/Showmax/go-fqdn"
 	"github.com/spf13/cobra"
 )
 
@@ -65,7 +66,10 @@ var buildHost string
 var buildUser *user.User
 
 func init() {
-	buildHost, _ = os.Hostname()
+	buildHost = fqdn.Get()
+	if buildHost == "localhost" {
+		buildHost, _ = os.Hostname()
+	}
 	buildUser, _ = user.Current()
 
 	rootCmd.AddCommand(versionCmd)
