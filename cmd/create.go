@@ -30,6 +30,8 @@ var hostname string
 var port int
 var root string
 var useHTTPS bool
+var username string
+var password string
 
 var createCmd = &cobra.Command{
 	Use:     "create",
@@ -46,6 +48,8 @@ var createCmd = &cobra.Command{
 		viper.Set("use_https", false)
 		viper.Set("port", 8000)
 		viper.Set("root", "/api")
+		viper.Set("username", "username")
+		viper.Set("password", "password")
 
 		// Check for a config file
 		log.Debugf("Checking if a configuration exists at %v", cfgFile)
@@ -58,8 +62,11 @@ var createCmd = &cobra.Command{
 				log.Debugf("No configuration file found at %v", cfgFile)
 				fmt.Println("No configuration exists. Creating...")
 				viper.WriteConfigAs(cfgFile)
+				if err := os.Chmod(cfgFile, 0600); err != nil {
+					log.Debugf("Failed to chmod file %v", err)
+				}
 				log.Debugf("Created new configuration at %v", cfgFile)
-				fmt.Println("A new configuration was created at", cfgFile)
+				fmt.Println("A new configuration was created. Please configure it at", cfgFile)
 			} else if _, err2 := os.Stat(cfgFile); err2 == nil && replace {
 				// File found and we've been told to replace it
 				log.Debugf("Replacing existing configuration at %v", cfgFile)
