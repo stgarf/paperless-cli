@@ -22,7 +22,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/stgarf/paperless-cli/paperless"
 )
+
+// PaperInst is an object to interact with a Paperless instance
+var PaperInst paperless.Paperless
 
 var cfgFile string
 var debugFlag bool
@@ -85,4 +90,12 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Debugln("Using config file:", viper.ConfigFileUsed())
 	}
+
+	// Initialize the Paperless struct
+	PaperInst.Hostname = viper.GetString("hostname")
+	PaperInst.UseHTTPS = viper.GetBool("use_https")
+	PaperInst.Port = viper.GetString("port")
+	PaperInst.Root = viper.GetString("root")
+	PaperInst.Username = viper.GetString("username")
+	PaperInst.Password = viper.GetString("password")
 }
