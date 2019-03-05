@@ -39,13 +39,8 @@ The configuration displayed will change based on the value of the --config flag.
 			fmt.Println("No configuration file found! Try 'config create'")
 		} else {
 			// Display configuration information
-			fmt.Printf("Configuration file: %v\n", viper.ConfigFileUsed())
-			fmt.Printf("Hostname: %v, Port: %v, API root: %v, HTTPS: %v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"), viper.Get("use_https"))
-			if v := viper.Get("use_https"); v != false {
-				fmt.Printf("Connection URL: https://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
-			} else {
-				fmt.Printf("Connection URL: http://%v:%v%v\n", viper.Get("hostname"), viper.Get("port"), viper.Get("root"))
-			}
+			fmt.Println(PaperInst)
+			PaperInst.ShowInstanceInformation()
 		}
 		log.Debug("Done calling 'show'")
 	},
