@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/google/martian/log"
+	log "github.com/sirupsen/logrus"
 )
 
 // HTTPClient is an HTTP client to interact with the Paperless API server
