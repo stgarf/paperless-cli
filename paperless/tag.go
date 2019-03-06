@@ -6,8 +6,8 @@ import (
 	"log"
 )
 
-// Tags .
-type Tags struct {
+// TagResults respresents the result of an API call after unmarshaling
+type TagResults struct {
 	Count    int    `json:"count"`
 	Next     string `json:"next"`
 	Previous string `json:"previous"`
@@ -26,8 +26,8 @@ type Tag struct {
 }
 
 func (t Tag) String() string {
-	return fmt.Sprintf("Slug: %v, Name: %v, Color: %v, Match: %v, Matching Algorithm: %v, Is Insensitive: %v",
-		t.Slug, t.Name, t.Color, t.Match, t.MatchingAlgorithm, t.IsInsensitive)
+	return fmt.Sprintf("ID: %v, Slug: %v, Name: %v, Color: %v, Match: %v, Matching Algorithm: %v, Is Insensitive: %v",
+		t.ID, t.Slug, t.Name, t.Color, t.Match, t.MatchingAlgorithm, t.IsInsensitive)
 }
 
 // GetTags returns a slice of Tag items
@@ -37,7 +37,7 @@ func (p Paperless) GetTags() ([]Tag, error) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	tags := Tags{}
+	tags := TagResults{}
 	json.Unmarshal(tagData, &tags)
 	return tags.Tags, nil
 }
@@ -53,7 +53,7 @@ func (p Paperless) GetTag(s string, caseSensitive bool) ([]Tag, error) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	tags := Tags{}
+	tags := TagResults{}
 	json.Unmarshal(tagData, &tags)
 	return tags.Tags, nil
 }
