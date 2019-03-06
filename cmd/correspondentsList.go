@@ -15,6 +15,9 @@
 package cmd
 
 import (
+	"fmt"
+
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +27,14 @@ var correspondentsListCmd = &cobra.Command{
 	Short:   "Get a list of correspondents",
 	Aliases: []string{"li", "l"},
 	Run: func(cmd *cobra.Command, args []string) {
+		corrs, err := PaperInst.GetCorrespondents()
+		if err != nil {
+			log.Errorf("%s", err)
+		}
+		fmt.Printf("%v results found:\n", len(corrs))
+		for _, corr := range corrs {
+			fmt.Println(corr)
+		}
 	},
 }
 
