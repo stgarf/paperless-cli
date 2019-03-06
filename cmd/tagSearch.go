@@ -30,14 +30,13 @@ var tagSearchCmd = &cobra.Command{
 	Aliases: []string{"s"},
 	Short:   "Search for tag by name",
 	Args:    cobra.NoArgs,
-	// 	Long: `A longer description that spans multiple lines and likely contains examples
-	// and usage of using your command. For example:
+	Long: `This allows you to search for a tag by name.
+The search uses a 'contains' search method with case sensitivity disabled by default.
 
-	// Cobra is a CLI library for Go that empowers applications.
-	// This application is a tool to generate the needed files
-	// to quickly create a Cobra application.`,
+Example usage:
+paperless-cli tag search -n taxes
+paperless-cli tag search -n donation -s`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//fmt.Printf("tagSearch called, term: %v, case sensitive?: %v\n", name, caseSensitive)
 		tags, err := PaperInst.GetTag(name, caseSensitive)
 		if err != nil {
 			log.Fatalf("Error %v", err)
@@ -52,6 +51,6 @@ var tagSearchCmd = &cobra.Command{
 func init() {
 	tagSearchCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the tag to search for (required)")
 	tagSearchCmd.MarkFlagRequired("name")
-	tagSearchCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "i", false, "Enable case sensitivity")
+	tagSearchCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
 	tagsCmd.AddCommand(tagSearchCmd)
 }
