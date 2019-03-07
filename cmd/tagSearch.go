@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -37,6 +38,7 @@ Example usage:
 paperless-cli tag search -n taxes
 paperless-cli tag search -n donation -s`,
 	Run: func(cmd *cobra.Command, args []string) {
+		name = url.QueryEscape(name)
 		tags, err := PaperInst.GetTag(name, caseSensitive)
 		if err != nil {
 			log.Fatalf("Error %v", err)

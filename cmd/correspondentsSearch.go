@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -33,7 +34,7 @@ Example usage:
 paperless-cli correspondent search -n "hertz rental"
 paperless-cli correspondent search -n dmv -s`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("correspondentsSearch called, %v, %v\n", name, caseSensitive)
+		name = url.QueryEscape(name)
 		corrs, err := PaperInst.GetCorrespondent(name, caseSensitive)
 		if err != nil {
 			log.Fatalf("Error %v", err)
