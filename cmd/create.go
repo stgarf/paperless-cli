@@ -54,7 +54,7 @@ var createCmd = &cobra.Command{
 		// Check for a config file
 		log.Debugf("Checking if a configuration exists at %v", cfgFile)
 		if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
-			// TODO: (sgarf): See if this ever gets fixed.
+			// TODO (sgarf): See if this ever gets fixed.
 			// https://github.com/spf13/viper/issues/433#issuecomment-356483379
 
 			if os.IsNotExist(err) {
