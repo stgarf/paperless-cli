@@ -17,13 +17,13 @@ type TagResults struct {
 
 // Tag represents a Paperless tag
 type Tag struct {
-	ID                int    `json:"id"`
-	Slug              string `json:"slug"`
-	Name              string `json:"name"`
-	Color             int    `json:"colour"`
-	Match             string `json:"match"`
-	MatchingAlgorithm int    `json:"matching_algorithm"`
-	IsInsensitive     bool   `json:"is_insensitive"`
+	ID                int               `json:"id"`
+	Slug              string            `json:"slug"`
+	Name              string            `json:"name"`
+	Color             Color             `json:"colour"`
+	Match             string            `json:"match"`
+	MatchingAlgorithm MatchingAlgorithm `json:"matching_algorithm"`
+	IsInsensitive     bool              `json:"is_insensitive"`
 }
 
 func (t Tag) String() string {
@@ -67,27 +67,68 @@ func (p Paperless) GetTag(s string, caseSensitive bool) ([]Tag, error) {
 	return tags.Tags, nil
 }
 
-// // Color is a tag color
-// type Color struct {
-// 	Value int
-// }
+// MatchingAlgorithm represents the match algorithm used
+type MatchingAlgorithm int
+
+var _AlgoValueToName = map[int]string{
+	1: "Any",
+	2: "All",
+	3: "Literal",
+	4: "Regular Expression",
+	5: "Fuzzy Match",
+}
+
+var _AlgoNameToValue = map[string]int{
+	"Any":                1,
+	"All":                2,
+	"Literal":            2,
+	"Regular Expression": 4,
+	"Fuzzy Match":        5,
+}
+
+func (m MatchingAlgorithm) String() string {
+	return _AlgoValueToName[int(m)]
+}
+
+// Color is a tag color
+type Color int
 
 // // nolint: golint
-// var (
-// 	ColorRegentStBlue      = Color{1}
-// 	ColorMatisse           = Color{2}
-// 	ColorFeijoa            = Color{3}
-// 	ColorForestGree        = Color{4}
-// 	ColorSweetPink         = Color{5}
-// 	ColorAlizarinCrimson   = Color{6}
-// 	ColorMacaroniAndCheese = Color{7}
-// 	ColorFlushOrange       = Color{8}
-// 	ColorLavenderGray      = Color{9}
-// 	ColorRoyalPurple       = Color{10}
-// 	ColorPaarl             = Color{11}
-// 	ColorBlack             = Color{12}
-// 	ColorSilver            = Color{13}
-// )
+var _ColorValueToName = map[int]string{
+	1:  "Regent St Blue",
+	2:  "Matisse",
+	3:  "Feijoa",
+	4:  "Forest Green",
+	5:  "Sweet Pink",
+	6:  "Alizarin Crimson",
+	7:  "Macaroni and Cheese",
+	8:  "Flush Orange",
+	9:  "Lavender Gray",
+	10: "Royal Purple",
+	11: "Paarl",
+	12: "Black",
+	13: "Silver",
+}
+
+var _ColorNameToValue = map[string]int{
+	"RegentStBlue":      1,
+	"Matisse":           2,
+	"Feijoa":            3,
+	"ForestGreen":       4,
+	"SweetPink":         5,
+	"AlizarinCrimson":   6,
+	"MacaroniAndCheese": 7,
+	"FlushOrange":       8,
+	"LavenderGray":      9,
+	"RoyalPurple":       10,
+	"Paarl":             11,
+	"Black":             12,
+	"Silver":            13,
+}
+
+func (c Color) String() string {
+	return _ColorValueToName[int(c)]
+}
 
 // // MatchingAlgorithm are Tag matching algorithms
 // type MatchingAlgorithm struct {
