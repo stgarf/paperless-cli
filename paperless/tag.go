@@ -67,29 +67,6 @@ func (p Paperless) GetTag(s string, caseSensitive bool) ([]Tag, error) {
 	return tags.Tags, nil
 }
 
-// MatchingAlgorithm represents the match algorithm used
-type MatchingAlgorithm int
-
-var _AlgoValueToName = map[int]string{
-	1: "Any",
-	2: "All",
-	3: "Literal",
-	4: "Regular Expression",
-	5: "Fuzzy Match",
-}
-
-var _AlgoNameToValue = map[string]int{
-	"Any":                1,
-	"All":                2,
-	"Literal":            2,
-	"Regular Expression": 4,
-	"Fuzzy Match":        5,
-}
-
-func (m MatchingAlgorithm) String() string {
-	return _AlgoValueToName[int(m)]
-}
-
 // Color is a tag color
 type Color int
 
@@ -129,17 +106,3 @@ var _ColorNameToValue = map[string]int{
 func (c Color) String() string {
 	return _ColorValueToName[int(c)]
 }
-
-// // MatchingAlgorithm are Tag matching algorithms
-// type MatchingAlgorithm struct {
-// 	Value int `json:"matching_algorithm"`
-// }
-
-// // nolint: golint
-// var (
-// 	MatchingAlgorithmAny               = MatchingAlgorithm{1}
-// 	MatchingAlgorithmAll               = MatchingAlgorithm{2}
-// 	MatchingAlgorithmLiteral           = MatchingAlgorithm{3}
-// 	MatchingAlgorithmRegularExpression = MatchingAlgorithm{4}
-// 	MatchingAlgorithmFuzzyMatch        = MatchingAlgorithm{5}
-// )
