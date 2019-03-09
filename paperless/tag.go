@@ -41,9 +41,9 @@ func (p Paperless) GetTags() ([]Tag, error) {
 	tags := TagResults{}
 	json.Unmarshal(tagData, &tags)
 	// FIXME (sgarf): // We're not fetching all the results, fix this
-	// if len(tags.Tags) < tags.Count {
-	// 	log.Errorln("We're not done fetching tags!!!")
-	// }
+	if len(tags.Tags) < tags.Count {
+		log.Warnln("We're not done fetching tags!!!")
+	}
 	return tags.Tags, nil
 }
 
@@ -61,9 +61,9 @@ func (p Paperless) GetTag(s string, caseSensitive bool) ([]Tag, error) {
 	tags := TagResults{}
 	json.Unmarshal(tagData, &tags)
 	// FIXME (sgarf): // We're not fetching all the results, fix this
-	// if len(tags.Tags) < tags.Count {
-	// 	log.Errorln("We're not done fetching tags!!!")
-	// }
+	if len(tags.Tags) < tags.Count {
+		log.Warnln("We're not done fetching tags!!!")
+	}
 	return tags.Tags, nil
 }
 

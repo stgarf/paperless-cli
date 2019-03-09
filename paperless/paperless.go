@@ -42,12 +42,12 @@ func (p Paperless) ShowInstanceInformation() {
 // ReturnHTTPResponse takes an http.Response pointer and returns a ([]bytes, error)
 func ReturnHTTPResponse(r *http.Response) ([]byte, error) {
 	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err == nil {
 		return b, nil
 	}
 	log.Errorf("%v", err)
 	return []byte{}, err
-
 }
 
 // Authenticate to a Paperless API instance

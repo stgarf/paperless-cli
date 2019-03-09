@@ -40,9 +40,9 @@ func (p Paperless) GetCorrespondents() ([]Correspondent, error) {
 	corrs := CorrResults{}
 	json.Unmarshal(cData, &corrs)
 	// FIXME (sgarf): // We're not fetching all the results, fix this
-	// if len(corrs.Correspondents) < corrs.Count {
-	// 	log.Errorln("We're not done fetching tags!!!")
-	// }
+	if len(corrs.Correspondents) < corrs.Count {
+		log.Warnln("We're not done fetching correspondents!!!")
+	}
 	return corrs.Correspondents, nil
 }
 
@@ -60,8 +60,8 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) ([]Corresponde
 	corrs := CorrResults{}
 	json.Unmarshal(cData, &corrs)
 	// FIXME (sgarf): // We're not fetching all the results, fix this
-	// if len(corrs.Correspondents) < corrs.Count {
-	// 	log.Errorln("We're not done fetching tags!!!")
-	// }
+	if len(corrs.Correspondents) < corrs.Count {
+		log.Warnln("We're not done fetching correspondents!!!")
+	}
 	return corrs.Correspondents, nil
 }
