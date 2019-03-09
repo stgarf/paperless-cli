@@ -73,7 +73,6 @@ func (p Paperless) switchResponse(r *http.Response) ([]byte, error) {
 		url, _ = url.Parse(p.String())
 		req.URL = url
 		r, err := HTTPClient.Do(req)
-		defer r.Body.Close()
 		if err != nil {
 			return []byte{}, err
 		}
@@ -97,7 +96,6 @@ func (p Paperless) MakeRequest(method string) ([]byte, error) {
 	switch method {
 	case "GET":
 		resp, err := HTTPClient.Get(p.String())
-		defer resp.Body.Close()
 		if err != nil {
 			return []byte{}, err
 		}
@@ -108,7 +106,6 @@ func (p Paperless) MakeRequest(method string) ([]byte, error) {
 		return data, nil
 	case "POST":
 		resp, err := HTTPClient.Post(p.String(), "application/json", nil)
-		defer resp.Body.Close()
 		if err != nil {
 			return []byte{}, err
 		}
@@ -119,7 +116,6 @@ func (p Paperless) MakeRequest(method string) ([]byte, error) {
 		return data, nil
 	default:
 		resp, err := HTTPClient.Get(p.String())
-		defer resp.Body.Close()
 		if err != nil {
 			return []byte{}, err
 		}
