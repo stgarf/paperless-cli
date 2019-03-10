@@ -22,32 +22,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var correspondentsSearchCmd = &cobra.Command{
+var documentsSearchCmd = &cobra.Command{
 	Use:     "search",
 	Aliases: []string{"s"},
-	Short:   "Search for a correspondent by name",
-	Long: `This allows you to search for a correspondent by name.
-The search uses a 'contains' search method with case sensitivity disabled by default.
-
-Example usage:
-paperless-cli correspondent search -n "hertz rental"
-paperless-cli correspondent search -n dmv -s`,
+	Short:   "Search for a document by name",
+	Long: `This allows you to search for a document by name.
+	The search uses a 'contains' search method with case sensitivity disabled by default.
+	
+	Example usage:
+	paperless-cli doc search -n "phone bill"
+	paperless-cli documents search -n donation -s.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name = url.QueryEscape(name)
-		corrs, err := PaperInst.GetCorrespondent(name, caseSensitive)
+		tags, err := PaperInst.GetDocument(name, caseSensitive)
 		if err != nil {
 			log.Fatalf("Error %v", err)
 		}
-		fmt.Printf("%v results found:\n", len(corrs))
-		for _, corr := range corrs {
-			fmt.Println(corr)
+		fmt.Printf("%v results found:\n", len(tags))
+		for _, tag := range tags {
+			fmt.Println(tag)
 		}
 	},
 }
 
 func init() {
-	correspondentsSearchCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
-	correspondentsSearchCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the correspondent to search for (required")
-	correspondentsSearchCmd.MarkFlagRequired("name")
-	correspondentsCmd.AddCommand(correspondentsSearchCmd)
+	documentsCmd.AddCommand(documentsSearchCmd)
+	documentsSearchCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
+	documentsSearchCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the correspondent to search for (required")
+	documentsSearchCmd.MarkFlagRequired("name")
 }
