@@ -16,20 +16,31 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-// tagListCmd represents the tagList command
-var tagListCmd = &cobra.Command{
-	Use:     "list",
-	Aliases: []string{"li", "l"},
-	Short:   "List tags from Paperless",
+var name string
+var caseSensitive bool
+
+var tagSearchCmd = &cobra.Command{
+	Use:     "search",
+	Aliases: []string{"s"},
+	Short:   "Search for tag by name",
+	Args:    cobra.NoArgs,
+	Long: `This allows you to search for a tag by name.
+The search uses a 'contains' search method with case sensitivity disabled by default.
+
+Example usage:
+paperless-cli tag search -n taxes
+paperless-cli tag search -n donation -s`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tags, err := PaperInst.GetTags()
+		name = url.QueryEscape(name)
+		tags, err := PaperInst.GetTag(name, caseSensitive)
 		if err != nil {
-			log.Errorf("%s", err)
+			log.Fatalf("Error %v", err)
 		}
 		fmt.Printf("%v results found:\n", len(tags))
 		for _, tag := range tags {
@@ -39,5 +50,8 @@ var tagListCmd = &cobra.Command{
 }
 
 func init() {
-	tagsCmd.AddCommand(tagListCmd)
+	tagSearchCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the tag to search for (required)")
+	tagSearchCmd.MarkFlagRequired("name")
+	tagSearchCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
+	tagsCmd.AddCommand(tagSearchCmd)
 }

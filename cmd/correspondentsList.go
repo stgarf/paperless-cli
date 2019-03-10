@@ -21,7 +21,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// correspondentsListCmd represents the correspondentsList command
 var correspondentsListCmd = &cobra.Command{
 	Use:     "list",
 	Short:   "Get a list of correspondents",

@@ -66,10 +66,29 @@ func (p Paperless) MakeGetRequest(urlString string) ([]gjson.Result, error) {
 		json := gjson.ParseBytes(b)
 		nextURL = json.Get("next").String()
 		moreResults := json.Get("results").Array()
+		if len(moreResults) == 0 {
+			results = json.Get("name").Array()
+		}
 		for _, res := range moreResults {
 			results = append(results, res)
 		}
 
 	}
 	return results, nil
+}
+
+// GetNameByID returns a name for a given ID path
+// e.g. "/api/correspondents/4/"
+func (p Paperless) GetNameByID(path string) string {
+	p.Root = path
+	u := fmt.Sprint(p)
+	results, err := p.MakeGetRequest(u)
+	if err != nil {
+		log.Errorf("An error occurred making request: %v", err.Error())
+	}
+	var s string
+	for _, result := range results {
+		s += result.String()
+	}
+	return s
 }

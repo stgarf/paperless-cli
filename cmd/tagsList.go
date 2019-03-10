@@ -15,15 +15,28 @@
 package cmd
 
 import (
+	"fmt"
+
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var documentsCmd = &cobra.Command{
-	Use:     "documents",
-	Aliases: []string{"document", "docs", "doc", "d"},
-	Short:   "Manage documents of Paperless instance",
+var tagListCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"li", "l"},
+	Short:   "List tags from Paperless",
+	Run: func(cmd *cobra.Command, args []string) {
+		tags, err := PaperInst.GetTags()
+		if err != nil {
+			log.Errorf("%s", err)
+		}
+		fmt.Printf("%v results found:\n", len(tags))
+		for _, tag := range tags {
+			fmt.Println(tag)
+		}
+	},
 }
 
 func init() {
-	rootCmd.AddCommand(documentsCmd)
+	tagsCmd.AddCommand(tagListCmd)
 }
