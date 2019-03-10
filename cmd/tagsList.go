@@ -21,7 +21,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// tagListCmd represents the tagList command
 var tagListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"li", "l"},

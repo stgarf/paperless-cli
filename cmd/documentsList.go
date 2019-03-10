@@ -21,13 +21,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// documentsListCmd represents the documentsList command
 var documentsListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"li", "l"},
 	Short:   "List documents from Paperless",
 	Run: func(cmd *cobra.Command, args []string) {
-		tags, err := PaperInst.GetTags()
+		tags, err := PaperInst.GetDocuments()
 		if err != nil {
 			log.Errorf("%s", err)
 		}

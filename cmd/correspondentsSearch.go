@@ -22,10 +22,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// correspondentsSearchCmd represents the correspondentsSearch command
 var correspondentsSearchCmd = &cobra.Command{
 	Use:     "search",
-	Aliases: []string{"sea", "se", "s"},
+	Aliases: []string{"s"},
 	Short:   "Search for a correspondent by name",
 	Long: `This allows you to search for a correspondent by name.
 The search uses a 'contains' search method with case sensitivity disabled by default.

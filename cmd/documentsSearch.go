@@ -34,7 +34,7 @@ var documentsSearchCmd = &cobra.Command{
 	paperless-cli documents search -n donation -s.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name = url.QueryEscape(name)
-		tags, err := PaperInst.GetTag(name, caseSensitive)
+		tags, err := PaperInst.GetDocument(name, caseSensitive)
 		if err != nil {
 			log.Fatalf("Error %v", err)
 		}
@@ -47,7 +47,7 @@ var documentsSearchCmd = &cobra.Command{
 
 func init() {
 	documentsCmd.AddCommand(documentsSearchCmd)
-	documentsCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
-	documentsCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the correspondent to search for (required")
-	documentsCmd.MarkFlagRequired("name")
+	documentsSearchCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
+	documentsSearchCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the correspondent to search for (required")
+	documentsSearchCmd.MarkFlagRequired("name")
 }

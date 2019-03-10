@@ -25,7 +25,6 @@ import (
 var name string
 var caseSensitive bool
 
-// tagSearchCmd represents the tagSearch command
 var tagSearchCmd = &cobra.Command{
 	Use:     "search",
 	Aliases: []string{"s"},
