@@ -8,3 +8,7 @@ use_https: false
 port: 8000
 # Path to the API root.
 root: /api
+# Username to auth to Paperless instance.
+username: myUsername
+# Username to auth to Paperless instance.
+password: mYpa$$w0rd.is.h0p3fully.s3cur3!!1
