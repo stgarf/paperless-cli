@@ -15,9 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -25,10 +22,6 @@ var documentsCmd = &cobra.Command{
 	Use:     "documents",
 	Aliases: []string{"document", "docs", "doc", "d"},
 	Short:   "Manage documents of Paperless instance",
-	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Called 'documents' with args %v", args)
-		fmt.Println("documents called")
-	},
 }
 
 func init() {
