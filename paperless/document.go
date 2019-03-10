@@ -2,6 +2,7 @@ package paperless
 
 import (
 	"fmt"
+	"net/url"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -25,7 +26,7 @@ type Document struct {
 }
 
 func (d Document) String() string {
-	return fmt.Sprintf("ID: %v, Corresponsent: %v, Title: %v, FileType: %v, "+
+	return fmt.Sprintf("ID: %v, Correspondent: %v, Title: %v, FileType: %v, "+
 		"Tags: %v, Checksum: %v, Created: %v, Modified: %v, Added: %v, FileName: "+
 		"%v, DownloadUrl: %v, ThumbnailUrl: %v", d.ID, d.Correspondent, d.Title,
 		d.FileType, d.Tags, d.Checksum, d.Created, d.Modified, d.Added,
@@ -38,8 +39,8 @@ type DocumentList []Document
 // GetDocuments returns a slice of Document items
 func (p Paperless) GetDocuments() (DocumentList, error) {
 	// A place to store the results
-	var t Document
-	var tl DocumentList
+	var document Document
+	var docList DocumentList
 
 	// Make the request
 	p.Root += "/documents/"
@@ -49,19 +50,29 @@ func (p Paperless) GetDocuments() (DocumentList, error) {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}
 
-	// Append results so far to DocumentList tl
-	for _, tag := range results {
-		gjson.Unmarshal([]byte(tag.Raw), &t)
-		tl = append(tl, t)
+	// Append results so far to DocumentList docList
+	for _, doc := range results {
+		gjson.Unmarshal([]byte(doc.Raw), &document)
+		// For each doc, resolve it's correspondent and tag names
+		// instead of Paperless API urls
+		idList := []string{}
+		correspondentID := p.GetNameByID(getPath(document.Correspondent))
+		for _, tag := range document.Tags {
+			tagID := p.GetNameByID(getPath(tag))
+			idList = append(idList, tagID)
+		}
+		document.Correspondent = correspondentID
+		document.Tags = idList
+		docList = append(docList, document)
 	}
-	return tl, nil
+	return docList, nil
 }
 
 // GetDocument returns a slice of Documents based on the search string
 func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, error) {
 	// A place to store the results
-	var t Document
-	var tl DocumentList
+	var document Document
+	var docList DocumentList
 
 	// Make the request
 	if caseSensitive {
@@ -75,10 +86,27 @@ func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, erro
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}
 
-	// Append results so far to DocumentList tl
-	for _, tag := range results {
-		gjson.Unmarshal([]byte(tag.Raw), &t)
-		tl = append(tl, t)
+	// Append results so far to DocumentList docList
+	for _, doc := range results {
+		gjson.Unmarshal([]byte(doc.Raw), &document)
+		// For each doc, resolve it's correspondents and doc
+		idList := []string{}
+		correspondentID := p.GetNameByID(getPath(document.Correspondent))
+		for _, tag := range document.Tags {
+			tagID := p.GetNameByID(getPath(tag))
+			idList = append(idList, tagID)
+		}
+		document.Correspondent = correspondentID
+		document.Tags = idList
+		docList = append(docList, document)
 	}
-	return tl, nil
+	return docList, nil
+}
+
+func getPath(s string) string {
+	url, err := url.Parse(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return url.Path
 }
