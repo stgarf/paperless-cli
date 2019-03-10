@@ -15,31 +15,39 @@
 package cmd
 
 import (
+	"fmt"
+	"net/url"
+
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-// documentsSearchCmd represents the documentsSearch command
 var documentsSearchCmd = &cobra.Command{
-	Use:   "search",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:     "search",
+	Aliases: []string{"s"},
+	Short:   "Search for a document by name",
+	Long: `This allows you to search for a document by name.
+	The search uses a 'contains' search method with case sensitivity disabled by default.
+	
+	Example usage:
+	paperless-cli doc search -n "phone bill"
+	paperless-cli documents search -n donation -s.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		name = url.QueryEscape(name)
+		tags, err := PaperInst.GetTag(name, caseSensitive)
+		if err != nil {
+			log.Fatalf("Error %v", err)
+		}
+		fmt.Printf("%v results found:\n", len(tags))
+		for _, tag := range tags {
+			fmt.Println(tag)
+		}
+	},
 }
 
 func init() {
 	documentsCmd.AddCommand(documentsSearchCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// documentsSearchCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// documentsSearchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	documentsCmd.Flags().BoolVarP(&caseSensitive, "case_sensitive", "s", false, "Enable case sensitivity")
+	documentsCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the correspondent to search for (required")
+	documentsCmd.MarkFlagRequired("name")
 }
