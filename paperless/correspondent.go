@@ -33,7 +33,6 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 
 	// Make the request
 	p.Root += "/correspondents"
-
 	u := fmt.Sprint(p)
 	results, err := p.MakeGetRequest(u)
 	if err != nil {
@@ -41,7 +40,6 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 	}
 
 	// Append results so far to CorrespondentList cl
-
 	for _, corr := range results {
 		gjson.Unmarshal([]byte(corr.Raw), &c)
 		cl = append(cl, c)
