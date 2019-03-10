@@ -8,8 +8,45 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// TagList is a list/slice of Tag structs
-type TagList []Tag
+// Color is a tag color
+type Color int
+
+// // nolint: golint
+var _ColorValueToName = map[int]string{
+	1:  "Regent St Blue",
+	2:  "Matisse",
+	3:  "Feijoa",
+	4:  "Forest Green",
+	5:  "Sweet Pink",
+	6:  "Alizarin Crimson",
+	7:  "Macaroni and Cheese",
+	8:  "Flush Orange",
+	9:  "Lavender Gray",
+	10: "Royal Purple",
+	11: "Paarl",
+	12: "Black",
+	13: "Silver",
+}
+
+var _ColorNameToValue = map[string]int{
+	"RegentStBlue":      1,
+	"Matisse":           2,
+	"Feijoa":            3,
+	"ForestGreen":       4,
+	"SweetPink":         5,
+	"AlizarinCrimson":   6,
+	"MacaroniAndCheese": 7,
+	"FlushOrange":       8,
+	"LavenderGray":      9,
+	"RoyalPurple":       10,
+	"Paarl":             11,
+	"Black":             12,
+	"Silver":            13,
+}
+
+func (c Color) String() string {
+	return _ColorValueToName[int(c)]
+}
 
 // Tag represents a Paperless tag
 type Tag struct {
@@ -26,6 +63,9 @@ func (t Tag) String() string {
 	return fmt.Sprintf("ID: %v, Slug: %v, Name: %v, Color: %v, Match: %v, Matching Algorithm: %v, Is Insensitive: %v",
 		t.ID, t.Slug, t.Name, t.Color, t.Match, t.MatchingAlgorithm, t.IsInsensitive)
 }
+
+// TagList is a list/slice of Tag structs
+type TagList []Tag
 
 // GetTags returns a slice of Tag items
 func (p Paperless) GetTags() (TagList, error) {
@@ -68,8 +108,8 @@ func (p Paperless) GetTags() (TagList, error) {
 		if err != nil {
 			log.Errorf("An error occurred making request: %v", err.Error())
 		}
-		moreTags := gjson.Get(string(resp), "results").Array()
-		for _, tag := range moreTags {
+		tags = gjson.Get(string(resp), "results").Array()
+		for _, tag := range tags {
 			gjson.Unmarshal([]byte(tag.Raw), &t)
 			tl = append(tl, t)
 		}
@@ -124,8 +164,8 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 		if err != nil {
 			log.Errorf("An error occurred making request: %v", err.Error())
 		}
-		moreTags := gjson.Get(string(resp), "results").Array()
-		for _, tag := range moreTags {
+		tags = gjson.Get(string(resp), "results").Array()
+		for _, tag := range tags {
 			gjson.Unmarshal([]byte(tag.Raw), &t)
 			tl = append(tl, t)
 		}
@@ -133,44 +173,4 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 	}
 
 	return tl, nil
-}
-
-// Color is a tag color
-type Color int
-
-// // nolint: golint
-var _ColorValueToName = map[int]string{
-	1:  "Regent St Blue",
-	2:  "Matisse",
-	3:  "Feijoa",
-	4:  "Forest Green",
-	5:  "Sweet Pink",
-	6:  "Alizarin Crimson",
-	7:  "Macaroni and Cheese",
-	8:  "Flush Orange",
-	9:  "Lavender Gray",
-	10: "Royal Purple",
-	11: "Paarl",
-	12: "Black",
-	13: "Silver",
-}
-
-var _ColorNameToValue = map[string]int{
-	"RegentStBlue":      1,
-	"Matisse":           2,
-	"Feijoa":            3,
-	"ForestGreen":       4,
-	"SweetPink":         5,
-	"AlizarinCrimson":   6,
-	"MacaroniAndCheese": 7,
-	"FlushOrange":       8,
-	"LavenderGray":      9,
-	"RoyalPurple":       10,
-	"Paarl":             11,
-	"Black":             12,
-	"Silver":            13,
-}
-
-func (c Color) String() string {
-	return _ColorValueToName[int(c)]
 }

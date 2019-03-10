@@ -1,19 +1,12 @@
 package paperless
 
 import (
-	"encoding/json"
 	"fmt"
+	"net/url"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 )
-
-// CorrResults respresents the result of an API call after unmarshaling
-type CorrResults struct {
-	Count          int             `json:"count"`
-	Next           string          `json:"next"`
-	Previous       string          `json:"previous"`
-	Correspondents []Correspondent `json:"results"`
-}
 
 // Correspondent represents a Paperless correspondent
 type Correspondent struct {
@@ -30,38 +23,114 @@ func (c Correspondent) String() string {
 		c.ID, c.Slug, c.Name, c.Match, c.MatchingAlgorithm, c.IsInsensitive)
 }
 
+// CorrespondentList is a list/slice of Correspondent
+type CorrespondentList []Correspondent
+
 // GetCorrespondents returns a slice of Correspondent items
-func (p Paperless) GetCorrespondents() ([]Correspondent, error) {
+func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
+	// A place to store the results
+	var c Correspondent
+	var cl CorrespondentList
+
+	// Make the request
 	p.Root += "/correspondents"
-	cData, err := p.MakeRequest("GET")
+
+	u := fmt.Sprint(p)
+	creds := []string{p.Username, p.Password}
+	resp, err := MakeGetRequest(creds, u)
 	if err != nil {
-		log.Fatalln(err)
+		log.Errorf("An error occurred making request: %v", err.Error())
 	}
-	corrs := CorrResults{}
-	json.Unmarshal(cData, &corrs)
-	// FIXME (sgarf): // We're not fetching all the results, fix this
-	if len(corrs.Correspondents) < corrs.Count {
-		log.Warnln("We're not done fetching correspondents!!!")
+
+	// Start processing the request JSON
+	corrs := gjson.Get(string(resp), "results").Array()
+	totalHave := len(corrs)
+	totalExpected := gjson.Get(string(resp), "count").Int()
+	nextURL := gjson.Get(string(resp), "next").String()
+
+	// Append results so far to TagList tl
+	for _, corrs := range corrs {
+		gjson.Unmarshal([]byte(corrs.Raw), &c)
+		cl = append(cl, c)
 	}
-	return corrs.Correspondents, nil
+	// Check if we have all the results or not
+	if totalHave < int(totalExpected) {
+		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
+		vals, err := url.Parse(nextURL)
+		if err != nil {
+			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
+		}
+		queryParams := vals.Query()
+		p.Root = fmt.Sprintf("%v?page=%v", vals.Path, queryParams.Get("page"))
+		u = fmt.Sprint(p)
+		log.Debugf("Fetching next page of results at: %v", u)
+		resp, err = MakeGetRequest(creds, u)
+		if err != nil {
+			log.Errorf("An error occurred making request: %v", err.Error())
+		}
+		corrs = gjson.Get(string(resp), "results").Array()
+		for _, corr := range corrs {
+			gjson.Unmarshal([]byte(corr.Raw), &c)
+			cl = append(cl, c)
+		}
+		return cl, nil
+	}
+
+	return cl, nil
 }
 
 // GetCorrespondent returns a slice of Tags based on the search string
-func (p Paperless) GetCorrespondent(s string, caseSensitive bool) ([]Correspondent, error) {
+func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (CorrespondentList, error) {
+	// A place to store the results
+	var c Correspondent
+	var cl CorrespondentList
+
+	// Make the request
 	if caseSensitive {
 		p.Root += "/correspondents/?name__contains=" + s
 	} else {
 		p.Root += "/correspondents/?name__icontains=" + s
 	}
-	cData, err := p.MakeRequest("GET")
+	u := fmt.Sprint(p)
+	creds := []string{p.Username, p.Password}
+	resp, err := MakeGetRequest(creds, u)
 	if err != nil {
-		log.Fatalln(err)
+		log.Errorf("An error occurred making request: %v", err.Error())
 	}
-	corrs := CorrResults{}
-	json.Unmarshal(cData, &corrs)
-	// FIXME (sgarf): // We're not fetching all the results, fix this
-	if len(corrs.Correspondents) < corrs.Count {
-		log.Warnln("We're not done fetching correspondents!!!")
+
+	// Start processing the request JSON
+	corrs := gjson.Get(string(resp), "results").Array()
+	totalHave := len(corrs)
+	totalExpected := gjson.Get(string(resp), "count").Int()
+	nextURL := gjson.Get(string(resp), "next").String()
+
+	// Append results so far to TagList tl
+	for _, corr := range corrs {
+		gjson.Unmarshal([]byte(corr.Raw), &c)
+		cl = append(cl, c)
 	}
-	return corrs.Correspondents, nil
+	// Check if we have all the results or not
+	if totalHave < int(totalExpected) {
+		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
+		vals, err := url.Parse(nextURL)
+		if err != nil {
+			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
+		}
+		queryParams := vals.Query()
+		p.Root = fmt.Sprintf("%v?page=%v", vals.Path, queryParams.Get("page"))
+		u = fmt.Sprint(p)
+		log.Debugf("Fetching next page of results at: %v", u)
+		resp, err = MakeGetRequest(creds, u)
+		if err != nil {
+			log.Errorf("An error occurred making request: %v", err.Error())
+		}
+		corrs = gjson.Get(string(resp), "results").Array()
+		for _, corr := range corrs {
+			gjson.Unmarshal([]byte(corr.Raw), &c)
+			cl = append(cl, c)
+		}
+		return cl, nil
+	}
+
+	return cl, nil
 }

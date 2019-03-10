@@ -1,8 +1,6 @@
 package paperless
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
