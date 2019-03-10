@@ -11,5 +11,5 @@ GOLDFLAGS=$($GOVVVBIN -flags)
 GOLDFLAGS=$($ECHOBIN $GOLDFLAGS | $SEDBIN -e 's|main|'$GOPKGPATH'|g')
 
 $ECHOBIN "Building..."
-$GOBIN build -ldflags="$GOLDFLAGS"
+$GOBIN build -ldflags="$GOLDFLAGS" -o bin/paperless-cli
 $ECHOBIN "Build complete."
