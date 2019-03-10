@@ -75,8 +75,7 @@ func (p Paperless) GetTags() (TagList, error) {
 	// Make the request
 	p.Root += "/tags/"
 	u := fmt.Sprint(p)
-	creds := []string{p.Username, p.Password}
-	results, err := MakeGetRequest(creds, u)
+	results, err := p.MakeGetRequest(u)
 	if err != nil {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}
@@ -102,8 +101,7 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 		p.Root += "/tags/?name__icontains=" + s
 	}
 	u := fmt.Sprint(p)
-	creds := []string{p.Username, p.Password}
-	results, err := MakeGetRequest(creds, u)
+	results, err := p.MakeGetRequest(u)
 	if err != nil {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}

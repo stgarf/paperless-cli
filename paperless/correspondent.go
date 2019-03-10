@@ -35,8 +35,7 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 	p.Root += "/correspondents"
 
 	u := fmt.Sprint(p)
-	creds := []string{p.Username, p.Password}
-	results, err := MakeGetRequest(creds, u)
+	results, err := p.MakeGetRequest(u)
 	if err != nil {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}
@@ -63,8 +62,7 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (Correspondent
 		p.Root += "/correspondents/?name__icontains=" + s
 	}
 	u := fmt.Sprint(p)
-	creds := []string{p.Username, p.Password}
-	results, err := MakeGetRequest(creds, u)
+	results, err := p.MakeGetRequest(u)
 	if err != nil {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}

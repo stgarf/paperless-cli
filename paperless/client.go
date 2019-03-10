@@ -31,12 +31,12 @@ func ReturnAuthenticatedRequest(u, p string) *http.Request {
 }
 
 // MakeGetRequest makes a request of method to url with args.
-func MakeGetRequest(creds []string, u string) ([]gjson.Result, error) {
+func (p Paperless) MakeGetRequest(u string) ([]gjson.Result, error) {
 	log.Debugf("GET: %v", u)
 
 	// Create a client and authenticated request
 	client := http.Client{Timeout: time.Second * 5}
-	req := ReturnAuthenticatedRequest(creds[0], creds[1])
+	req := ReturnAuthenticatedRequest(p.Username, p.Password)
 	req.Method = "GET"
 	urlPtr, _ := url.Parse(u)
 	req.URL = urlPtr
@@ -65,7 +65,7 @@ func MakeGetRequest(creds []string, u string) ([]gjson.Result, error) {
 	nextURL := json.Get("next").String()
 	results := json.Get("results").Array()
 	for nextURL != "" {
-		req := ReturnAuthenticatedRequest(creds[0], creds[1])
+		req := ReturnAuthenticatedRequest(p.Username, p.Password)
 		req.Method = "GET"
 		urlPtr, _ := url.Parse(nextURL)
 		req.URL = urlPtr
