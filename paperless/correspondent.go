@@ -132,8 +132,6 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (Correspondent
 			gjson.Unmarshal([]byte(corr.Raw), &c)
 			cl = append(cl, c)
 		}
-		return cl, nil
 	}
-
 	return cl, nil
 }

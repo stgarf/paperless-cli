@@ -115,9 +115,7 @@ func (p Paperless) GetTags() (TagList, error) {
 			gjson.Unmarshal([]byte(tag.Raw), &t)
 			tl = append(tl, t)
 		}
-		return tl, nil
 	}
-
 	return tl, nil
 }
 
@@ -173,8 +171,6 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 			gjson.Unmarshal([]byte(tag.Raw), &t)
 			tl = append(tl, t)
 		}
-		return tl, nil
 	}
-
 	return tl, nil
 }
