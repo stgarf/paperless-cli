@@ -86,7 +86,7 @@ func (p Paperless) GetTags() (TagList, error) {
 	tags := gjson.Get(string(resp), "results").Array()
 	totalHave := len(tags)
 	totalExpected := gjson.Get(string(resp), "count").Int()
-	tagsNext := gjson.Get(string(resp), "next").String()
+	nextURL := gjson.Get(string(resp), "next").String()
 
 	// Append results so far to TagList tl
 	for _, tag := range tags {
@@ -94,9 +94,9 @@ func (p Paperless) GetTags() (TagList, error) {
 		tl = append(tl, t)
 	}
 	// Check if we have all the results or not
-	if totalHave < int(totalExpected) {
-		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, tagsNext)
-		vals, err := url.Parse(tagsNext)
+	for totalHave < int(totalExpected) {
+		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
+		vals, err := url.Parse(nextURL)
 		if err != nil {
 			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
 		}
@@ -109,6 +109,8 @@ func (p Paperless) GetTags() (TagList, error) {
 			log.Errorf("An error occurred making request: %v", err.Error())
 		}
 		tags = gjson.Get(string(resp), "results").Array()
+		totalHave += len(tags)
+		nextURL = gjson.Get(string(resp), "next").String()
 		for _, tag := range tags {
 			gjson.Unmarshal([]byte(tag.Raw), &t)
 			tl = append(tl, t)
@@ -142,7 +144,7 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 	tags := gjson.Get(string(resp), "results").Array()
 	totalHave := len(tags)
 	totalExpected := gjson.Get(string(resp), "count").Int()
-	tagsNext := gjson.Get(string(resp), "next").String()
+	nextURL := gjson.Get(string(resp), "next").String()
 
 	// Append results so far to TagList tl
 	for _, tag := range tags {
@@ -150,9 +152,9 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 		tl = append(tl, t)
 	}
 	// Check if we have all the results or not
-	if totalHave < int(totalExpected) {
-		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, tagsNext)
-		vals, err := url.Parse(tagsNext)
+	for totalHave < int(totalExpected) {
+		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
+		vals, err := url.Parse(nextURL)
 		if err != nil {
 			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
 		}
@@ -165,6 +167,8 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 			log.Errorf("An error occurred making request: %v", err.Error())
 		}
 		tags = gjson.Get(string(resp), "results").Array()
+		totalHave += len(tags)
+		nextURL = gjson.Get(string(resp), "next").String()
 		for _, tag := range tags {
 			gjson.Unmarshal([]byte(tag.Raw), &t)
 			tl = append(tl, t)

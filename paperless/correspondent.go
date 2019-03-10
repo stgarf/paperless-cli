@@ -48,13 +48,13 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 	totalExpected := gjson.Get(string(resp), "count").Int()
 	nextURL := gjson.Get(string(resp), "next").String()
 
-	// Append results so far to TagList tl
+	// Append results so far to CorrespondentList cl
 	for _, corrs := range corrs {
 		gjson.Unmarshal([]byte(corrs.Raw), &c)
 		cl = append(cl, c)
 	}
 	// Check if we have all the results or not
-	if totalHave < int(totalExpected) {
+	for totalHave < int(totalExpected) {
 		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
 		vals, err := url.Parse(nextURL)
 		if err != nil {
@@ -69,11 +69,12 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 			log.Errorf("An error occurred making request: %v", err.Error())
 		}
 		corrs = gjson.Get(string(resp), "results").Array()
+		totalHave += len(corrs)
+		nextURL = gjson.Get(string(resp), "next").String()
 		for _, corr := range corrs {
 			gjson.Unmarshal([]byte(corr.Raw), &c)
 			cl = append(cl, c)
 		}
-		return cl, nil
 	}
 
 	return cl, nil
@@ -104,13 +105,13 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (Correspondent
 	totalExpected := gjson.Get(string(resp), "count").Int()
 	nextURL := gjson.Get(string(resp), "next").String()
 
-	// Append results so far to TagList tl
+	// Append results so far to CorrespondentList cl
 	for _, corr := range corrs {
 		gjson.Unmarshal([]byte(corr.Raw), &c)
 		cl = append(cl, c)
 	}
 	// Check if we have all the results or not
-	if totalHave < int(totalExpected) {
+	for totalHave < int(totalExpected) {
 		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
 		vals, err := url.Parse(nextURL)
 		if err != nil {
@@ -125,6 +126,8 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (Correspondent
 			log.Errorf("An error occurred making request: %v", err.Error())
 		}
 		corrs = gjson.Get(string(resp), "results").Array()
+		totalHave += len(corrs)
+		nextURL = gjson.Get(string(resp), "next").String()
 		for _, corr := range corrs {
 			gjson.Unmarshal([]byte(corr.Raw), &c)
 			cl = append(cl, c)
