@@ -12,17 +12,6 @@ import (
 // HTTPClient is an HTTP client to interact with the Paperless API server
 var HTTPClient http.Client
 
-// Paperless struct represents a Paperless instance
-type Paperless struct {
-	Hostname string
-	UseHTTPS bool
-	Port     string
-	Root     string
-	Username string
-	Password string
-	Request  *http.Request
-}
-
 func (p Paperless) String() string {
 	if !p.UseHTTPS {
 		return fmt.Sprintf("http://%v:%v%v", p.Hostname, p.Port, p.Root)

@@ -1,19 +1,15 @@
 package paperless
 
 import (
-	"encoding/json"
 	"fmt"
+	"net/url"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 )
 
-// TagResults respresents the result of an API call after unmarshaling
-type TagResults struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous string `json:"previous"`
-	Tags     []Tag  `json:"results"`
-}
+// TagList is a list/slice of Tag structs
+type TagList []Tag
 
 // Tag represents a Paperless tag
 type Tag struct {
@@ -32,39 +28,111 @@ func (t Tag) String() string {
 }
 
 // GetTags returns a slice of Tag items
-func (p Paperless) GetTags() ([]Tag, error) {
-	p.Root += "/tags"
-	tagData, err := p.MakeRequest("GET")
+func (p Paperless) GetTags() (TagList, error) {
+	// A place to store the results
+	var t Tag
+	var tl TagList
+
+	// Make the request
+	p.Root += "/tags/"
+	u := fmt.Sprint(p)
+	creds := []string{p.Username, p.Password}
+	resp, err := MakeGetRequest(creds, u)
 	if err != nil {
-		log.Fatalln(err)
+		log.Errorf("An error occurred making request: %v", err.Error())
 	}
-	tags := TagResults{}
-	json.Unmarshal(tagData, &tags)
-	// FIXME (sgarf): // We're not fetching all the results, fix this
-	if len(tags.Tags) < tags.Count {
-		log.Warnln("We're not done fetching tags!!!")
+
+	// Start processing the request JSON
+	tags := gjson.Get(string(resp), "results").Array()
+	totalHave := len(tags)
+	totalExpected := gjson.Get(string(resp), "count").Int()
+	tagsNext := gjson.Get(string(resp), "next").String()
+
+	// Append results so far to TagList tl
+	for _, tag := range tags {
+		gjson.Unmarshal([]byte(tag.Raw), &t)
+		tl = append(tl, t)
 	}
-	return tags.Tags, nil
+	// Check if we have all the results or not
+	if totalHave < int(totalExpected) {
+		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, tagsNext)
+		vals, err := url.Parse(tagsNext)
+		if err != nil {
+			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
+		}
+		queryParams := vals.Query()
+		p.Root = fmt.Sprintf("%v?page=%v", vals.Path, queryParams.Get("page"))
+		u = fmt.Sprint(p)
+		log.Debugf("Fetching next page of results at: %v", u)
+		resp, err = MakeGetRequest(creds, u)
+		if err != nil {
+			log.Errorf("An error occurred making request: %v", err.Error())
+		}
+		moreTags := gjson.Get(string(resp), "results").Array()
+		for _, tag := range moreTags {
+			gjson.Unmarshal([]byte(tag.Raw), &t)
+			tl = append(tl, t)
+		}
+		return tl, nil
+	}
+
+	return tl, nil
 }
 
 // GetTag returns a slice of Tags based on the search string
-func (p Paperless) GetTag(s string, caseSensitive bool) ([]Tag, error) {
+func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
+	// A place to store the results
+	var t Tag
+	var tl TagList
+
+	// Make the request
 	if caseSensitive {
 		p.Root += "/tags/?name__contains=" + s
 	} else {
 		p.Root += "/tags/?name__icontains=" + s
 	}
-	tagData, err := p.MakeRequest("GET")
+	u := fmt.Sprint(p)
+	creds := []string{p.Username, p.Password}
+	resp, err := MakeGetRequest(creds, u)
 	if err != nil {
-		log.Fatalln(err)
+		log.Errorf("An error occurred making request: %v", err.Error())
 	}
-	tags := TagResults{}
-	json.Unmarshal(tagData, &tags)
-	// FIXME (sgarf): // We're not fetching all the results, fix this
-	if len(tags.Tags) < tags.Count {
-		log.Warnln("We're not done fetching tags!!!")
+
+	// Start processing the request JSON
+	tags := gjson.Get(string(resp), "results").Array()
+	totalHave := len(tags)
+	totalExpected := gjson.Get(string(resp), "count").Int()
+	tagsNext := gjson.Get(string(resp), "next").String()
+
+	// Append results so far to TagList tl
+	for _, tag := range tags {
+		gjson.Unmarshal([]byte(tag.Raw), &t)
+		tl = append(tl, t)
 	}
-	return tags.Tags, nil
+	// Check if we have all the results or not
+	if totalHave < int(totalExpected) {
+		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, tagsNext)
+		vals, err := url.Parse(tagsNext)
+		if err != nil {
+			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
+		}
+		queryParams := vals.Query()
+		p.Root = fmt.Sprintf("%v?page=%v", vals.Path, queryParams.Get("page"))
+		u = fmt.Sprint(p)
+		log.Debugf("Fetching next page of results at: %v", u)
+		resp, err = MakeGetRequest(creds, u)
+		if err != nil {
+			log.Errorf("An error occurred making request: %v", err.Error())
+		}
+		moreTags := gjson.Get(string(resp), "results").Array()
+		for _, tag := range moreTags {
+			gjson.Unmarshal([]byte(tag.Raw), &t)
+			tl = append(tl, t)
+		}
+		return tl, nil
+	}
+
+	return tl, nil
 }
 
 // Color is a tag color
