@@ -1,3 +1,4 @@
 # VS Code workspace
 *.code-workspace
 *.swp
+bin/
