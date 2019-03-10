@@ -1,94 +1,11 @@
 package paperless
 
 import (
-	"encoding/json"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 )
-
-// TagResults respresents the result of an API call after unmarshaling
-type TagResults struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous string `json:"previous"`
-	Tags     []Tag  `json:"results"`
-}
-
-// Tag represents a Paperless tag
-type Tag struct {
-	ID                int               `json:"id"`
-	Slug              string            `json:"slug"`
-	Name              string            `json:"name"`
-	Color             Color             `json:"colour"`
-	Match             string            `json:"match"`
-	MatchingAlgorithm MatchingAlgorithm `json:"matching_algorithm"`
-	IsInsensitive     bool              `json:"is_insensitive"`
-}
-
-func (t Tag) String() string {
-	return fmt.Sprintf("ID: %v, Slug: %v, Name: %v, Color: %v, Match: %v, Matching Algorithm: %v, Is Insensitive: %v",
-		t.ID, t.Slug, t.Name, t.Color, t.Match, t.MatchingAlgorithm, t.IsInsensitive)
-}
-
-// GetTags returns a slice of Tag items
-func (p Paperless) GetTags() ([]Tag, error) {
-	p.Root += "/tags"
-	tagData, err := p.MakeRequest("GET")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	tags := TagResults{}
-	json.Unmarshal(tagData, &tags)
-	// FIXME (sgarf): // We're not fetching all the results, fix this
-	// if len(tags.Tags) < tags.Count {
-	// 	log.Errorln("We're not done fetching tags!!!")
-	// }
-	return tags.Tags, nil
-}
-
-// GetTag returns a slice of Tags based on the search string
-func (p Paperless) GetTag(s string, caseSensitive bool) ([]Tag, error) {
-	if caseSensitive {
-		p.Root += "/tags/?name__contains=" + s
-	} else {
-		p.Root += "/tags/?name__icontains=" + s
-	}
-	tagData, err := p.MakeRequest("GET")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	tags := TagResults{}
-	json.Unmarshal(tagData, &tags)
-	// FIXME (sgarf): // We're not fetching all the results, fix this
-	// if len(tags.Tags) < tags.Count {
-	// 	log.Errorln("We're not done fetching tags!!!")
-	// }
-	return tags.Tags, nil
-}
-
-// MatchingAlgorithm represents the match algorithm used
-type MatchingAlgorithm int
-
-var _AlgoValueToName = map[int]string{
-	1: "Any",
-	2: "All",
-	3: "Literal",
-	4: "Regular Expression",
-	5: "Fuzzy Match",
-}
-
-var _AlgoNameToValue = map[string]int{
-	"Any":                1,
-	"All":                2,
-	"Literal":            2,
-	"Regular Expression": 4,
-	"Fuzzy Match":        5,
-}
-
-func (m MatchingAlgorithm) String() string {
-	return _AlgoValueToName[int(m)]
-}
 
 // Color is a tag color
 type Color int
@@ -130,16 +47,69 @@ func (c Color) String() string {
 	return _ColorValueToName[int(c)]
 }
 
-// // MatchingAlgorithm are Tag matching algorithms
-// type MatchingAlgorithm struct {
-// 	Value int `json:"matching_algorithm"`
-// }
+// Tag represents a Paperless tag
+type Tag struct {
+	ID                int               `json:"id"`
+	Slug              string            `json:"slug"`
+	Name              string            `json:"name"`
+	Color             Color             `json:"colour"`
+	Match             string            `json:"match"`
+	MatchingAlgorithm MatchingAlgorithm `json:"matching_algorithm"`
+	IsInsensitive     bool              `json:"is_insensitive"`
+}
 
-// // nolint: golint
-// var (
-// 	MatchingAlgorithmAny               = MatchingAlgorithm{1}
-// 	MatchingAlgorithmAll               = MatchingAlgorithm{2}
-// 	MatchingAlgorithmLiteral           = MatchingAlgorithm{3}
-// 	MatchingAlgorithmRegularExpression = MatchingAlgorithm{4}
-// 	MatchingAlgorithmFuzzyMatch        = MatchingAlgorithm{5}
-// )
+func (t Tag) String() string {
+	return fmt.Sprintf("ID: %v, Slug: %v, Name: %v, Color: %v, Match: %v, Matching Algorithm: %v, Is Insensitive: %v",
+		t.ID, t.Slug, t.Name, t.Color, t.Match, t.MatchingAlgorithm, t.IsInsensitive)
+}
+
+// TagList is a list/slice of Tag structs
+type TagList []Tag
+
+// GetTags returns a slice of Tag items
+func (p Paperless) GetTags() (TagList, error) {
+	// A place to store the results
+	var t Tag
+	var tl TagList
+
+	// Make the request
+	p.Root += "/tags/"
+	u := fmt.Sprint(p)
+	results, err := p.MakeGetRequest(u)
+	if err != nil {
+		log.Errorf("An error occurred making request: %v", err.Error())
+	}
+
+	// Append results so far to TagList tl
+	for _, tag := range results {
+		gjson.Unmarshal([]byte(tag.Raw), &t)
+		tl = append(tl, t)
+	}
+	return tl, nil
+}
+
+// GetTag returns a slice of Tags based on the search string
+func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
+	// A place to store the results
+	var t Tag
+	var tl TagList
+
+	// Make the request
+	if caseSensitive {
+		p.Root += "/tags/?name__contains=" + s
+	} else {
+		p.Root += "/tags/?name__icontains=" + s
+	}
+	u := fmt.Sprint(p)
+	results, err := p.MakeGetRequest(u)
+	if err != nil {
+		log.Errorf("An error occurred making request: %v", err.Error())
+	}
+
+	// Append results so far to TagList tl
+	for _, tag := range results {
+		gjson.Unmarshal([]byte(tag.Raw), &t)
+		tl = append(tl, t)
+	}
+	return tl, nil
+}
