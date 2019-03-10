@@ -2,7 +2,6 @@ package paperless
 
 import (
 	"fmt"
-	"net/url"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -37,46 +36,17 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 
 	u := fmt.Sprint(p)
 	creds := []string{p.Username, p.Password}
-	resp, err := MakeGetRequest(creds, u)
+	results, err := MakeGetRequest(creds, u)
 	if err != nil {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}
 
-	// Start processing the request JSON
-	corrs := gjson.Get(string(resp), "results").Array()
-	totalHave := len(corrs)
-	totalExpected := gjson.Get(string(resp), "count").Int()
-	nextURL := gjson.Get(string(resp), "next").String()
-
 	// Append results so far to CorrespondentList cl
-	for _, corrs := range corrs {
-		gjson.Unmarshal([]byte(corrs.Raw), &c)
+
+	for _, corr := range results {
+		gjson.Unmarshal([]byte(corr.Raw), &c)
 		cl = append(cl, c)
 	}
-	// Check if we have all the results or not
-	for totalHave < int(totalExpected) {
-		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
-		vals, err := url.Parse(nextURL)
-		if err != nil {
-			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
-		}
-		queryParams := vals.Query()
-		p.Root = fmt.Sprintf("%v?page=%v", vals.Path, queryParams.Get("page"))
-		u = fmt.Sprint(p)
-		log.Debugf("Fetching next page of results at: %v", u)
-		resp, err = MakeGetRequest(creds, u)
-		if err != nil {
-			log.Errorf("An error occurred making request: %v", err.Error())
-		}
-		corrs = gjson.Get(string(resp), "results").Array()
-		totalHave += len(corrs)
-		nextURL = gjson.Get(string(resp), "next").String()
-		for _, corr := range corrs {
-			gjson.Unmarshal([]byte(corr.Raw), &c)
-			cl = append(cl, c)
-		}
-	}
-
 	return cl, nil
 }
 
@@ -94,44 +64,15 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (Correspondent
 	}
 	u := fmt.Sprint(p)
 	creds := []string{p.Username, p.Password}
-	resp, err := MakeGetRequest(creds, u)
+	results, err := MakeGetRequest(creds, u)
 	if err != nil {
 		log.Errorf("An error occurred making request: %v", err.Error())
 	}
 
-	// Start processing the request JSON
-	corrs := gjson.Get(string(resp), "results").Array()
-	totalHave := len(corrs)
-	totalExpected := gjson.Get(string(resp), "count").Int()
-	nextURL := gjson.Get(string(resp), "next").String()
-
 	// Append results so far to CorrespondentList cl
-	for _, corr := range corrs {
+	for _, corr := range results {
 		gjson.Unmarshal([]byte(corr.Raw), &c)
 		cl = append(cl, c)
-	}
-	// Check if we have all the results or not
-	for totalHave < int(totalExpected) {
-		log.Debugf("Have: %v, Wanted: %v, Next URL: %v", totalHave, totalExpected, nextURL)
-		vals, err := url.Parse(nextURL)
-		if err != nil {
-			log.Fatalf("Error occurred parsing to URL: %v", err.Error())
-		}
-		queryParams := vals.Query()
-		p.Root = fmt.Sprintf("%v?page=%v", vals.Path, queryParams.Get("page"))
-		u = fmt.Sprint(p)
-		log.Debugf("Fetching next page of results at: %v", u)
-		resp, err = MakeGetRequest(creds, u)
-		if err != nil {
-			log.Errorf("An error occurred making request: %v", err.Error())
-		}
-		corrs = gjson.Get(string(resp), "results").Array()
-		totalHave += len(corrs)
-		nextURL = gjson.Get(string(resp), "next").String()
-		for _, corr := range corrs {
-			gjson.Unmarshal([]byte(corr.Raw), &c)
-			cl = append(cl, c)
-		}
 	}
 	return cl, nil
 }
