@@ -34,13 +34,13 @@ var documentsSearchCmd = &cobra.Command{
 	paperless-cli documents search -n donation -s.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name = url.QueryEscape(name)
-		tags, err := PaperInst.GetDocument(name, caseSensitive)
+		docs, err := PaperInst.GetDocument(name, caseSensitive)
 		if err != nil {
 			log.Fatalf("Error %v", err)
 		}
-		fmt.Printf("%v results found:\n", len(tags))
-		for _, tag := range tags {
-			fmt.Println(tag)
+		fmt.Printf("%v results found:\n", len(docs))
+		for i, doc := range docs {
+			fmt.Printf("%d. %v - %v\n", i+1, doc.Correspondent, doc.Title)
 		}
 	},
 }

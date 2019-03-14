@@ -31,8 +31,8 @@ var correspondentsListCmd = &cobra.Command{
 			log.Errorf("%s", err)
 		}
 		fmt.Printf("%v results found:\n", len(corrs))
-		for _, corr := range corrs {
-			fmt.Println(corr)
+		for i, corr := range corrs {
+			fmt.Printf("%d. %v\n", i+1, corr.Name)
 		}
 	},
 }

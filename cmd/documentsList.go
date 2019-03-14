@@ -26,13 +26,13 @@ var documentsListCmd = &cobra.Command{
 	Aliases: []string{"li", "l"},
 	Short:   "List documents from Paperless",
 	Run: func(cmd *cobra.Command, args []string) {
-		tags, err := PaperInst.GetDocuments()
+		docs, err := PaperInst.GetDocuments()
 		if err != nil {
 			log.Errorf("%s", err)
 		}
-		fmt.Printf("%v results found:\n", len(tags))
-		for _, tag := range tags {
-			fmt.Println(tag)
+		fmt.Printf("%v results found:\n", len(docs))
+		for i, doc := range docs {
+			fmt.Printf("%d. %v - %v\n", i+1, doc.Correspondent, doc.Title)
 		}
 	},
 }
