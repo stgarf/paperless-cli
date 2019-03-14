@@ -31,8 +31,8 @@ var tagListCmd = &cobra.Command{
 			log.Errorf("%s", err)
 		}
 		fmt.Printf("%v results found:\n", len(tags))
-		for _, tag := range tags {
-			fmt.Println(tag)
+		for i, tag := range tags {
+			fmt.Printf("%d. %v\n", i+1, tag.Name)
 		}
 	},
 }

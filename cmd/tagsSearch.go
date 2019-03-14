@@ -43,8 +43,8 @@ paperless-cli tag search -n donation -s`,
 			log.Fatalf("Error %v", err)
 		}
 		fmt.Printf("%v results found:\n", len(tags))
-		for _, tag := range tags {
-			fmt.Println(tag)
+		for i, tag := range tags {
+			fmt.Printf("%d. %v\n", i+1, tag.Name)
 		}
 	},
 }
