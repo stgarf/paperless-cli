@@ -1,4 +1,29 @@
 # paperless-cli
+[![license](http://img.shields.io/badge/license-Apache%20v2-orange.svg)](https://raw.githubusercontent.com/stgarf/paperless-cli/master/LICENSE)
+
+# Table of Contents
+
+- [Description](#description)
+- [Installation and Usage](#Installation-and-usage)
+  * [Prerequisites](#prerequisites)
+  * [Precompiled binary](#precompiled-binary)
+  * [Self-compiled binary](#self-compiled-binary)
+  * [Usage](#usage)
+    - [Check paperless-cli version](#check-paperless-cli-version)
+    - [Setting up a config](#setting-up-a-config)
+- [Development](#development)
+  * [Prerequisites](#prerequisites)
+  * [Get the code](#get-the-code)
+  * [Running the tests](#running-the-tests)
+- [Built With](#built-with)
+- [Contributing](#contributing)
+- [Versioning](#versioning)
+- [Authors](#authors)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+
+## Description
 
 A CLI tool written in Go to interface with a [Paperless](https://github.com/the-paperless-project/paperless) instance.
 
@@ -78,7 +103,7 @@ $ go get -du github.com/stgarf/paperless-cli
 
 The source code will be located in `$GOPATH/src/github.com/stgarf/paperless-cli`.
 
-## Running the tests
+### Running the tests
 
 `$ go test`
 
@@ -114,6 +139,6 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 
 ## Acknowledgments
 
-* [DanielQuinn](https://github.com/danielquinn) The awesome community of people maintaining [Paperless](https://github.com/the-paperless-project/paperless)
+* [Daniel Quinn](https://github.com/danielquinn) for starting Paperless and the awesome community of people maintaining [Paperless](https://github.com/the-paperless-project/paperless)
 * Seth Junot for rubber duck debugging - [xSetech](https://github.com/xSetech)
-* Hat tip to anyone whose code was used
+* Hat tip to anyone whose code was imported!
