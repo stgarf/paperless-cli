@@ -32,7 +32,7 @@ var documentsListCmd = &cobra.Command{
 		}
 		fmt.Printf("%v results found:\n", len(docs))
 		for i, doc := range docs {
-			fmt.Printf("%d. %v - %v\n", i+1, doc.Correspondent, doc.Title)
+			fmt.Printf("%d. %v - %v %+q\n", i+1, doc.Correspondent, doc.Title, doc.Tags)
 		}
 	},
 }
