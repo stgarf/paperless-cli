@@ -8,13 +8,14 @@ command -v govvv >/dev/null 2>&1 || {
     $GOBIN install github.com/ahmetb/govvv;
     $ECHOBIN '. Done.';
 } 
+command -v gox >/dev/null 2>&1 || {
+    $ECHOBIN -en 'Need gox, building and installing..';
+    $GOBIN install github.com/mitchellh/gox;
+    $ECHOBIN '. Done.';
+} 
 GOVVVBIN=$(command -v govvv) || GOVVVBIN=${GOVVVBIN:=$GOPATH/bin/govvv}
-SEDBIN=$(command -v sed)
-
-GOPKGPATH=$($GOBIN list ./cmd)
-GOLDFLAGS=$($GOVVVBIN -flags)
-GOLDFLAGS=$($ECHOBIN $GOLDFLAGS | $SEDBIN -e 's|main|'$GOPKGPATH'|g')
+GOXBIN=$(command -v gox) || GOXBIN=${GOXBIN:=$GOPATH/bin/gox}
 
 $ECHOBIN -ne "Building.."
-$GOBIN build -ldflags="$GOLDFLAGS" -o bin/paperless-cli
+$GOXBIN -os="linux darwin windows" -arch="amd64" -output="./bin/paperless-cli.{{.OS}}.{{.Arch}}" -ldflags "$($GOVVVBIN -flags -pkg $($GOVVVBIN list ./cmd))" -verbose ./...
 $ECHOBIN ". Build complete."
