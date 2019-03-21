@@ -3,6 +3,9 @@ package paperless
 import (
 	"fmt"
 	"net/url"
+	"regexp"
+	"strconv"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -42,6 +45,10 @@ func (p Paperless) GetDocuments() (DocumentList, error) {
 	var document Document
 	var docList DocumentList
 
+	// Build the ID to Name maps
+	go p.mapCorrespondents()
+	go p.mapTags()
+
 	// Make the request
 	p.Root += "/documents/"
 	u := fmt.Sprint(p)
@@ -56,9 +63,9 @@ func (p Paperless) GetDocuments() (DocumentList, error) {
 		// For each doc, resolve it's correspondent and tag names
 		// instead of Paperless API urls
 		idList := []string{}
-		correspondentID := p.GetNameByID(getPath(document.Correspondent))
+		correspondentID := _CorrIDToName[urlToID(document.Correspondent)]
 		for _, tag := range document.Tags {
-			tagID := p.GetNameByID(getPath(tag))
+			tagID := _TagIDToName[urlToID(tag)]
 			idList = append(idList, tagID)
 		}
 		document.Correspondent = correspondentID
@@ -73,6 +80,10 @@ func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, erro
 	// A place to store the results
 	var document Document
 	var docList DocumentList
+
+	// Build the ID to Name maps
+	go p.mapCorrespondents()
+	go p.mapTags()
 
 	// Make the request
 	if caseSensitive {
@@ -91,9 +102,9 @@ func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, erro
 		gjson.Unmarshal([]byte(doc.Raw), &document)
 		// For each doc, resolve it's correspondents and doc
 		idList := []string{}
-		correspondentID := p.GetNameByID(getPath(document.Correspondent))
+		correspondentID := _CorrIDToName[urlToID(document.Correspondent)]
 		for _, tag := range document.Tags {
-			tagID := p.GetNameByID(getPath(tag))
+			tagID := _TagIDToName[urlToID(tag)]
 			idList = append(idList, tagID)
 		}
 		document.Correspondent = correspondentID
@@ -109,4 +120,37 @@ func getPath(s string) string {
 		log.Fatal(err)
 	}
 	return url.Path
+}
+
+var _CorrIDToName map[int]string
+var _TagIDToName map[int]string
+
+func (p Paperless) mapCorrespondents() {
+	_CorrIDToName = make(map[int]string)
+	p.Root = "/api"
+	list, err := p.GetCorrespondents()
+	if err != nil {
+		log.Panicln(err)
+	}
+	for _, c := range list {
+		_CorrIDToName[c.ID] = c.Name
+	}
+}
+
+func (p Paperless) mapTags() {
+	_TagIDToName = make(map[int]string)
+	p.Root = "/api"
+	list, err := p.GetTags()
+	if err != nil {
+		log.Panicln(err)
+	}
+	for _, c := range list {
+		_TagIDToName[c.ID] = c.Name
+	}
+}
+
+func urlToID(s string) int {
+	r := regexp.MustCompile("/([0-9]+)/")
+	i, _ := strconv.ParseInt(strings.Trim(r.FindString(s), "/"), 10, 32)
+	return int(i)
 }
