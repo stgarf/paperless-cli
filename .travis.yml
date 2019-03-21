@@ -1,0 +1,47 @@
+language: go
+sudo: false
+matrix:
+  include:
+    # "1.x" always refers to the latest Go version, inc. the patch release.
+    # e.g. "1.x" is 1.11 until 1.11.1 is available.
+    - go: 1.12.x
+      env:
+        - GO111MODULE=on
+        - LATEST=true
+
+before_install:
+  # govv for build info / gox simplifies building for multiple architectures
+  - go get github.com/mitchellh/gox
+  - go get github.com/ahmetb/govvv
+
+install:
+  - # skip
+
+script:
+  - go get -t -v ./...
+  - diff -u <(echo -n) <(gofmt -d .)
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v -race ./...
+  # Only build binaries from the latest Go release.
+  - if [ "${LATEST}" = "true" ]; then gox -os="linux darwin windows" -arch="amd64" -output="paperless-cli.{{.OS}}.{{.Arch}}" -ldflags "$(govvv -flags -pkg $(govvv list ./cmd))" -verbose ./...; fi
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    # Your *encrypted* GitHub key, as the output of the Travis CI CLI tool.
+    secure: S6tMvS5xdzhFc/ARDjS8ItEbelWMaEARxJn9pjBkhOIEx/cP8QYpm1+DgpUw8NVKQg0Q+CfqlBHKn9sv0umFsJsEWhNpY965HD/+d1aBLfkt69M7SCMyBidFPJ6v850g7uwmqb3B7BZ3GcUN0hH3hkluXoZkX+y2uXJvSlzpASLxnaq87P0lbn3FJVFxquue5NedqvhmCga7EZVYE4KfchTAuCYuUv22pnxtwLzQ1ZSVm1fmgmZQJ1kOGKNUr2tablhqEyRw4emUBwMU3zqwkLWLLVrANZ1u2Tz1S2dfKNf7QYMVeeBBWZZkZGHTqxydcy3FZmJwteHj/7sdIXCP2Z0xOGpd9EpeQi0Sfq5xfpFvRkGiNZgCXAFOHhCwgvnbrvEDm9GzxeQE+ZYmbJNQ1npHS7FYNzSG7ayCfHfeJ0rcpnYpjJrFsQrIe5WYNB8u6YaZ2YFA98ozHnwHJtzKLVBy9/ybK+L7i4GxqFYtRk1snrFtj2E1ShSsXVoBBtM3A+1IUbzw1mcQQEbchyaK5qQgpk9hW9EjdhdSlAE1ftIf0M+kM1Q70EAGLP1kLoMK7ZOysEB79SCxC4k16GTsmw7pDVKl0xeo6xIDwLPEzTCptL3t97eIqGzm1OFiqubwZzRQH6bc+6fzUQzg5gcEycsxqEDlRa1abgVfudY5HrM=
+  file:
+  # The names of the binaries to output, based on the -output template passed to gox.
+  - paperless-cli.windows.amd64.exe
+  - paperless-cli.darwin.amd64
+  - paperless-cli.linux.amd64
+  on:
+    # What to repository to build
+    repo: stgarf/paperless-cli
+    # Only build binaries for tagged commits
+    tags: true
+    condition: $LATEST = true
+
+## Credits:
+# https://blog.questionable.services/article/build-go-binaries-travis-ci-github/
