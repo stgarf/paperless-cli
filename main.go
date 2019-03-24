@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
+Package paperless-cli is the root of the packages used for paperless-cli and
+interacting with a Paperless instance.
+
+*/
 package main
 
 import "github.com/stgarf/paperless-cli/cmd"
