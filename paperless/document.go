@@ -2,7 +2,6 @@ package paperless
 
 import (
 	"fmt"
-	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -11,7 +10,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// Document represents a Paperless document
+// Document is a struct representation of Paperless' /api/documents/<id> JSON response.
 type Document struct {
 	ID            int      `json:"id"`
 	Correspondent string   `json:"correspondent"`
@@ -28,6 +27,7 @@ type Document struct {
 	ThumbnailURL  string   `json:"thumbnail_url"`
 }
 
+// How should we represent a Document object when trying to stringify it? This returns the struct as a string.
 func (d Document) String() string {
 	return fmt.Sprintf("ID: %v, Correspondent: %v, Title: %v, FileType: %v, "+
 		"Tags: %v, Checksum: %v, Created: %v, Modified: %v, Added: %v, FileName: "+
@@ -36,46 +36,11 @@ func (d Document) String() string {
 		d.FileName, d.DownloadURL, d.ThumbnailURL)
 }
 
-// DocumentList is a list/slice of Document structs
+// DocumentList is a slice of
+// https://godoc.org/github.com/stgarf/paperless-cli/paperless/#Document structs.
 type DocumentList []Document
 
-// GetDocuments returns a slice of Document items
-func (p Paperless) GetDocuments() (DocumentList, error) {
-	// A place to store the results
-	var document Document
-	var docList DocumentList
-
-	// Build the ID to Name maps
-	go p.mapCorrespondents()
-	go p.mapTags()
-
-	// Make the request
-	p.Root += "/documents/"
-	u := fmt.Sprint(p)
-	results, err := p.MakeGetRequest(u)
-	if err != nil {
-		log.Errorf("An error occurred making request: %v", err.Error())
-	}
-
-	// Append results so far to DocumentList docList
-	for _, doc := range results {
-		gjson.Unmarshal([]byte(doc.Raw), &document)
-		// For each doc, resolve it's correspondent and tag names
-		// instead of Paperless API urls
-		idList := []string{}
-		correspondentID := _CorrIDToName[urlToID(document.Correspondent)]
-		for _, tag := range document.Tags {
-			tagID := _TagIDToName[urlToID(tag)]
-			idList = append(idList, tagID)
-		}
-		document.Correspondent = correspondentID
-		document.Tags = idList
-		docList = append(docList, document)
-	}
-	return docList, nil
-}
-
-// GetDocument returns a slice of Documents based on the search string
+// GetDocument returns a https://godoc.org/github.com/stgarf/paperless-cli/paperless/#DocumentList matching the search string.
 func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, error) {
 	// A place to store the results
 	var document Document
@@ -102,9 +67,9 @@ func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, erro
 		gjson.Unmarshal([]byte(doc.Raw), &document)
 		// For each doc, resolve it's correspondents and doc
 		idList := []string{}
-		correspondentID := _CorrIDToName[urlToID(document.Correspondent)]
+		correspondentID := corrIDToName[urlToID(document.Correspondent)]
 		for _, tag := range document.Tags {
-			tagID := _TagIDToName[urlToID(tag)]
+			tagID := tagIDToName[urlToID(tag)]
 			idList = append(idList, tagID)
 		}
 		document.Correspondent = correspondentID
@@ -114,41 +79,76 @@ func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, erro
 	return docList, nil
 }
 
-func getPath(s string) string {
-	url, err := url.Parse(s)
+// GetDocuments returns a https://godoc.org/github.com/stgarf/paperless-cli/paperless/#DocumentList.
+func (p Paperless) GetDocuments() (DocumentList, error) {
+	// A place to store the results
+	var document Document
+	var docList DocumentList
+
+	// Build the ID to Name maps
+	go p.mapCorrespondents()
+	go p.mapTags()
+
+	// Make the request
+	p.Root += "/documents/"
+	u := fmt.Sprint(p)
+	results, err := p.MakeGetRequest(u)
 	if err != nil {
-		log.Fatal(err)
+		log.Errorf("An error occurred making request: %v", err.Error())
 	}
-	return url.Path
+
+	// Append results so far to DocumentList docList
+	for _, doc := range results {
+		gjson.Unmarshal([]byte(doc.Raw), &document)
+		// For each doc, resolve it's correspondent and tag names
+		// instead of Paperless API urls
+		idList := []string{}
+		correspondentID := corrIDToName[urlToID(document.Correspondent)]
+		for _, tag := range document.Tags {
+			tagID := tagIDToName[urlToID(tag)]
+			idList = append(idList, tagID)
+		}
+		document.Correspondent = correspondentID
+		document.Tags = idList
+		docList = append(docList, document)
+	}
+	return docList, nil
 }
 
-var _CorrIDToName map[int]string
-var _TagIDToName map[int]string
+// corrIDToName is a map[int]string of Paperless correspondents to their id number.
+var corrIDToName map[int]string
 
+// tagIDToName is a map[int]string of Paperless tags to their id number.
+var tagIDToName map[int]string
+
+// mapCorrespondents calls (paperless).GetCorrespondents() and populates the corrIDToName map.
 func (p Paperless) mapCorrespondents() {
-	_CorrIDToName = make(map[int]string)
+	corrIDToName = make(map[int]string)
 	p.Root = "/api"
 	list, err := p.GetCorrespondents()
 	if err != nil {
 		log.Panicln(err)
 	}
 	for _, c := range list {
-		_CorrIDToName[c.ID] = c.Name
+		corrIDToName[c.ID] = c.Name
 	}
 }
 
+// mapTags calls (paperless).GetTags() and populates the tagIDToName map.
 func (p Paperless) mapTags() {
-	_TagIDToName = make(map[int]string)
+	tagIDToName = make(map[int]string)
 	p.Root = "/api"
 	list, err := p.GetTags()
 	if err != nil {
 		log.Panicln(err)
 	}
 	for _, c := range list {
-		_TagIDToName[c.ID] = c.Name
+		tagIDToName[c.ID] = c.Name
 	}
 }
 
+// urlToID takes a Paperless Tag or Correspondet ID url and
+// returns the ID off the end of it.
 func urlToID(s string) int {
 	r := regexp.MustCompile("/([0-9]+)/")
 	i, _ := strconv.ParseInt(strings.Trim(r.FindString(s), "/"), 10, 32)

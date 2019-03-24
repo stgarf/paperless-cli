@@ -1,9 +1,15 @@
 package paperless
 
-// MatchingAlgorithm represents the match algorithm used
+// MatchingAlgorithm is an integer representing the matching algorithm of a paperless tag or correspondent.
+// There's a map[int]string to resolve the integer to human-readable names and a map[string]int for vice-versa.
 type MatchingAlgorithm int
 
-var _AlgoValueToName = map[int]string{
+/*
+AlgoValueToName is a map[string]int for Paperless matching algorithms.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#MatchingAlgorithm.
+*/
+var AlgoValueToName = map[int]string{
 	1: "Any",
 	2: "All",
 	3: "Literal",
@@ -11,7 +17,12 @@ var _AlgoValueToName = map[int]string{
 	5: "Fuzzy Match",
 }
 
-var _AlgoNameToValue = map[string]int{
+/*
+AlgoNameToValue is a map[string]int for Paperless matching algorithms.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#MatchingAlgorithm.
+*/
+var AlgoNameToValue = map[string]int{
 	"Any":                1,
 	"All":                2,
 	"Literal":            2,
@@ -19,6 +30,12 @@ var _AlgoNameToValue = map[string]int{
 	"Fuzzy Match":        5,
 }
 
+/*
+How should we represent a Match object when trying to stringify it? This returns the struct as a string.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#pkg-variables
+for more information and algorithm mappings.
+*/
 func (m MatchingAlgorithm) String() string {
-	return _AlgoValueToName[int(m)]
+	return AlgoValueToName[int(m)]
 }

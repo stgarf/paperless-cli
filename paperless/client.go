@@ -12,7 +12,12 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// Paperless struct represents a Paperless instance
+/*
+Paperless is a struct representation to hold a Paperless instances' configuration details.
+
+It also implements a few functions to interact with a Paperless instance such as
+Get{Correspondent,Document,Tag}{,s}, MakeGetRequest, and ShowInstanceInformation.
+*/
 type Paperless struct {
 	Hostname string
 	UseHTTPS bool
@@ -22,7 +27,8 @@ type Paperless struct {
 	Password string
 }
 
-// ReturnAuthenticatedRequest to a Paperless API instance
+// ReturnAuthenticatedRequest takes a username and password string and
+// returns a *http.Request with Authorization and User-Agent headers set.
 func ReturnAuthenticatedRequest(u, p string) *http.Request {
 	request, _ := http.NewRequest("", "", nil)
 	request.Header.Set("User-Agent", "paperless-cli")
@@ -30,9 +36,10 @@ func ReturnAuthenticatedRequest(u, p string) *http.Request {
 	return request
 }
 
-// MakeGetRequest makes a request of method to url with args.
+// MakeGetRequest takes a url string and
+// returns a slice of gjson.Result objects and an error if there's one.
 func (p Paperless) MakeGetRequest(urlString string) ([]gjson.Result, error) {
-	log.Debugf("GET: %v", urlString)
+	log.Debugf("MakeGetRequest to: %v", urlString)
 
 	// Create a client and authenticated request
 	client := http.Client{Timeout: time.Second * 5}
@@ -75,20 +82,4 @@ func (p Paperless) MakeGetRequest(urlString string) ([]gjson.Result, error) {
 
 	}
 	return results, nil
-}
-
-// GetNameByID returns a name for a given ID path
-// e.g. "/api/correspondents/4/"
-func (p Paperless) GetNameByID(path string) string {
-	p.Root = path
-	u := fmt.Sprint(p)
-	results, err := p.MakeGetRequest(u)
-	if err != nil {
-		log.Errorf("An error occurred making request: %v", err.Error())
-	}
-	var s string
-	for _, result := range results {
-		s += result.String()
-	}
-	return s
 }
