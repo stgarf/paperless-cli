@@ -7,11 +7,22 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// Color is a tag color
+/*
+Color is an integer representing the tag color of a paperless tag. There's a
+map[int]string to resolve the integer to human-readable names and a map[string]int
+for vice-versa.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#pkg-variables
+for more information and color mappings.
+*/
 type Color int
 
-// // nolint: golint
-var _ColorValueToName = map[int]string{
+/*
+ColorValueToName is a map[int]string for Paperless tag colors.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#Color
+*/
+var ColorValueToName = map[int]string{
 	1:  "Regent St Blue",
 	2:  "Matisse",
 	3:  "Feijoa",
@@ -27,7 +38,12 @@ var _ColorValueToName = map[int]string{
 	13: "Silver",
 }
 
-var _ColorNameToValue = map[string]int{
+/*
+ColorNameToValue is a map[string]int for Paperless tag colors.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#Color
+*/
+var ColorNameToValue = map[string]int{
 	"RegentStBlue":      1,
 	"Matisse":           2,
 	"Feijoa":            3,
@@ -43,11 +59,17 @@ var _ColorNameToValue = map[string]int{
 	"Silver":            13,
 }
 
+/*
+How should we represent a Tag color when trying to stringify it? This returns the struct as a string.
+
+See https://godoc.org/github.com/stgarf/paperless-cli/paperless/#pkg-variables
+for more information and color mappings.
+*/
 func (c Color) String() string {
-	return _ColorValueToName[int(c)]
+	return ColorValueToName[int(c)]
 }
 
-// Tag represents a Paperless tag
+// Tag is a struct representation of Paperless' /api/tags/<id> JSON response.
 type Tag struct {
 	ID                int               `json:"id"`
 	Slug              string            `json:"slug"`
@@ -58,22 +80,27 @@ type Tag struct {
 	IsInsensitive     bool              `json:"is_insensitive"`
 }
 
+// How should we represent a Tag object when trying to stringify it? This returns the struct as a string.
 func (t Tag) String() string {
 	return fmt.Sprintf("ID: %v, Slug: %v, Name: %v, Color: %v, Match: %v, Matching Algorithm: %v, Is Insensitive: %v",
 		t.ID, t.Slug, t.Name, t.Color, t.Match, t.MatchingAlgorithm, t.IsInsensitive)
 }
 
-// TagList is a list/slice of Tag structs
+// TagList is a slice of https://godoc.org/github.com/stgarf/paperless-cli/paperless/#Tag structs.
 type TagList []Tag
 
-// GetTags returns a slice of Tag items
-func (p Paperless) GetTags() (TagList, error) {
+// GetTag returns a https://godoc.org/github.com/stgarf/paperless-cli/paperless/#TagList matching the search string.
+func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 	// A place to store the results
 	var t Tag
 	var tl TagList
 
 	// Make the request
-	p.Root += "/tags/"
+	if caseSensitive {
+		p.Root += "/tags/?name__contains=" + s
+	} else {
+		p.Root += "/tags/?name__icontains=" + s
+	}
 	u := fmt.Sprint(p)
 	results, err := p.MakeGetRequest(u)
 	if err != nil {
@@ -88,18 +115,14 @@ func (p Paperless) GetTags() (TagList, error) {
 	return tl, nil
 }
 
-// GetTag returns a slice of Tags based on the search string
-func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
+// GetTags returns a https://godoc.org/github.com/stgarf/paperless-cli/paperless/#TagList.
+func (p Paperless) GetTags() (TagList, error) {
 	// A place to store the results
 	var t Tag
 	var tl TagList
 
 	// Make the request
-	if caseSensitive {
-		p.Root += "/tags/?name__contains=" + s
-	} else {
-		p.Root += "/tags/?name__icontains=" + s
-	}
+	p.Root += "/tags/"
 	u := fmt.Sprint(p)
 	results, err := p.MakeGetRequest(u)
 	if err != nil {
