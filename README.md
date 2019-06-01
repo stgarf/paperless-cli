@@ -1,5 +1,5 @@
 # paperless-cli
-[![license](http://img.shields.io/badge/license-Apache%20v2-orange.svg)](https://raw.githubusercontent.com/stgarf/paperless-cli/master/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache%20v2-orange.svg)](https://raw.githubusercontent.com/stgarf/paperless-cli/master/LICENSE)
 [![Build Status](https://travis-ci.org/stgarf/paperless-cli.svg?branch=master)](https://travis-ci.org/stgarf/paperless-cli)
 
 # Table of Contents
@@ -112,13 +112,13 @@ Really though, there are none and need to be written.
 
 ## Built With
 
-* [cobra](https://github.com/spf13/cobra/) - A Commander for modern Go CLI interactions
-* [logrus](http://github.com/sirupsen/logrus) - Structured, pluggable logging for Go
-* [gjson](github.com/tidwall/gjson) - Get JSON values quickly - JSON Parser for Go
-* [viper](github.com/spf13/viper) - Go configuration with fangs
-* [go-fqdn](github.com/Showmax/go-fqdn) - Simple wrapper around net and os golang standard libraries providing Fully Qualified Domain Name of the machine
-* [go-homedir](github.com/mitchellh/go-homedir) - Go library for detecting and expanding the user's home directory without cgo
-* [govvv](github.com/ahmetb/govvv) - "go build" wrapper to add version info to Golang applications
+* [cobra](https://github.com/spf13/cobra) - A Commander for modern Go CLI interactions
+* [logrus](https://github.com/sirupsen/logrus) - Structured, pluggable logging for Go
+* [gjson](https://github.com/tidwall/gjson) - Get JSON values quickly - JSON Parser for Go
+* [viper](https://github.com/spf13/viper) - Go configuration with fangs
+* [go-fqdn](https://github.com/Showmax/go-fqdn) - Simple wrapper around net and os golang standard libraries providing Fully Qualified Domain Name of the machine
+* [go-homedir](https://github.com/mitchellh/go-homedir) - Go library for detecting and expanding the user's home directory without cgo
+* [govvv](https://github.com/ahmetb/govvv) - "go build" wrapper to add version info to Golang applications
 
 ## Contributing
 
@@ -126,7 +126,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on the code of conduc
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning, roughly. For the versions available, see the [tags on this repository](https://github.com/stgarf/paperless-cli/tags). 
+We use [SemVer](https://semver.org/) for versioning, roughly. For the versions available, see the [tags on this repository](https://github.com/stgarf/paperless-cli/tags).
 
 ## Authors
 
