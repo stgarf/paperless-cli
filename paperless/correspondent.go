@@ -1,10 +1,10 @@
 package paperless
 
 import (
+	"encoding/json"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
 // Correspondent is a struct representation of Paperless' /api/correspondents/<id> JSON response.
@@ -46,7 +46,8 @@ func (p Paperless) GetCorrespondent(s string, caseSensitive bool) (Correspondent
 
 	// Append results so far to CorrespondentList cl
 	for _, corr := range results {
-		gjson.Unmarshal([]byte(corr.Raw), &c)
+		json.Unmarshal([]byte(corr.Raw), &c)
+		json.Unmarshal([]byte(corr.Raw), &c)
 		cl = append(cl, c)
 	}
 	return cl, nil
@@ -68,7 +69,7 @@ func (p Paperless) GetCorrespondents() (CorrespondentList, error) {
 
 	// Append results so far to CorrespondentList cl
 	for _, corr := range results {
-		gjson.Unmarshal([]byte(corr.Raw), &c)
+		json.Unmarshal([]byte(corr.Raw), &c)
 		cl = append(cl, c)
 	}
 	return cl, nil
