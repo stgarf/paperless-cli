@@ -4,7 +4,7 @@ matrix:
   include:
     # "1.x" always refers to the latest Go version, inc. the patch release.
     # e.g. "1.x" is 1.11 until 1.11.1 is available.
-    - go: 1.12.x
+    - go: 1.14.x
       env:
         - GO111MODULE=on
         - LATEST=true
