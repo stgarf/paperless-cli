@@ -1,13 +1,13 @@
 package paperless
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
 // Document is a struct representation of Paperless' /api/documents/<id> JSON response.
@@ -64,7 +64,7 @@ func (p Paperless) GetDocument(s string, caseSensitive bool) (DocumentList, erro
 
 	// Append results so far to DocumentList docList
 	for _, doc := range results {
-		gjson.Unmarshal([]byte(doc.Raw), &document)
+		json.Unmarshal([]byte(doc.Raw), &document)
 		// For each doc, resolve it's correspondents and doc
 		idList := []string{}
 		correspondentID := corrIDToName[urlToID(document.Correspondent)]
@@ -99,7 +99,7 @@ func (p Paperless) GetDocuments() (DocumentList, error) {
 
 	// Append results so far to DocumentList docList
 	for _, doc := range results {
-		gjson.Unmarshal([]byte(doc.Raw), &document)
+		json.Unmarshal([]byte(doc.Raw), &document)
 		// For each doc, resolve it's correspondent and tag names
 		// instead of Paperless API urls
 		idList := []string{}

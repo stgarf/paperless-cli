@@ -1,10 +1,10 @@
 package paperless
 
 import (
+	"encoding/json"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
 /*
@@ -109,7 +109,7 @@ func (p Paperless) GetTag(s string, caseSensitive bool) (TagList, error) {
 
 	// Append results so far to TagList tl
 	for _, tag := range results {
-		gjson.Unmarshal([]byte(tag.Raw), &t)
+		json.Unmarshal([]byte(tag.Raw), &t)
 		tl = append(tl, t)
 	}
 	return tl, nil
@@ -131,7 +131,7 @@ func (p Paperless) GetTags() (TagList, error) {
 
 	// Append results so far to TagList tl
 	for _, tag := range results {
-		gjson.Unmarshal([]byte(tag.Raw), &t)
+		json.Unmarshal([]byte(tag.Raw), &t)
 		tl = append(tl, t)
 	}
 	return tl, nil
