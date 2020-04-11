@@ -13,24 +13,12 @@ import (
 
 var documentselection int
 
-func (p Paperless) setFullDownloadURL(location string) string {
-	switch p.UseHTTPS {
-	case true:
-		return "https://" + p.Hostname + location
-	case false:
-		return "http://" + p.Hostname + location
-	}
-	return ""
-}
-
 func (p Paperless) writeFile(document Document) {
-	downloadURL := p.setFullDownloadURL(document.DownloadURL)
+	downloadURL := p.DownloadString(document.DownloadURL)
 
 	client := http.Client{Timeout: time.Second * 5}
 	log.Debugf("downloading from: %v", downloadURL)
-	req, _ := http.NewRequest("GET", downloadURL, nil)
-	req.Header.Set("User-Agent", "paperless-cli")
-	req.SetBasicAuth(p.Username, p.Password)
+	req := ReturnAuthenticatedRequest(p.Username, p.Password)
 
 	resp, err := client.Do(req)
 	if err != nil {
