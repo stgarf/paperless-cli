@@ -21,3 +21,11 @@ func (p Paperless) showInstanceInformation() string {
 func (p Paperless) ShowInstanceInformation() {
 	fmt.Println(p.showInstanceInformation())
 }
+
+// DownloadString returns a string URL to fetch a document from the API.
+func (p Paperless) DownloadString(documentPath string) string {
+	if !p.UseHTTPS {
+		return fmt.Sprintf("http://%v:%v%v", p.Hostname, p.Port, documentPath)
+	}
+	return fmt.Sprintf("https://%v:%v%v", p.Hostname, p.Port, documentPath)
+}
