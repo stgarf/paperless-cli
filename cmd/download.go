@@ -16,7 +16,7 @@ var downloadCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debugf("Called Download with args %v", args)
 		if len(args) < 1 {
-			log.Debugf("Missing filename to download")
+			log.Info("Missing filename to download")
 		}
 		if viper.ConfigFileUsed() == "" {
 			fmt.Println("No configuration file found! Try 'config create'")
