@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -19,6 +20,9 @@ func (p Paperless) writeFile(document Document) {
 	client := http.Client{Timeout: time.Second * 5}
 	log.Debugf("downloading from: %v", downloadURL)
 	req := ReturnAuthenticatedRequest(p.Username, p.Password)
+	req.Method = "GET"
+	urlPtr, _ := url.Parse(downloadURL)
+	req.URL = urlPtr
 
 	resp, err := client.Do(req)
 	if err != nil {
