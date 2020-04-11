@@ -131,6 +131,7 @@ We use [SemVer](https://semver.org/) for versioning, roughly. For the versions a
 ## Authors
 
 * **Steve Garf** - *Initial CLI work* - [stgarf](https://github.com/stgarf)
+* **Zibby Mofrad** - *Document Download option* - [stgarf](https://github.com/zibby)
 
 See also the list of [contributors](https://github.com/stgarf/paperless-cli/contributors) who participated in this project.
 
