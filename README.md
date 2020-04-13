@@ -1,6 +1,10 @@
 # paperless-cli
-[![license](https://img.shields.io/badge/license-Apache%20v2-orange.svg)](https://raw.githubusercontent.com/stgarf/paperless-cli/master/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache%20v2-success.svg)](https://raw.githubusercontent.com/stgarf/paperless-cli/master/LICENSE)
 [![Build Status](https://travis-ci.org/stgarf/paperless-cli.svg?branch=master)](https://travis-ci.org/stgarf/paperless-cli)
+
+![badge](https://img.shields.io/badge/stargazers-over%20time-yellow)
+[![Stargazers over time](https://starchart.cc/stgarf/paperless-cli.svg)](https://starchart.cc/stgarf/paperless-cli)
+
 
 # Table of Contents
 
