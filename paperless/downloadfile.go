@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var documentselection int
+var selection int
 
 func (p Paperless) writeFile(document Document) {
 	downloadURL := p.DownloadString(document.DownloadURL)
@@ -46,27 +46,28 @@ func (p Paperless) writeFile(document Document) {
 func (p Paperless) DownloadFiles(filename string) {
 	documents, err := Paperless.GetDocument(p, filename, true)
 	if err != nil {
-		log.Errorf("Error finding file")
+		log.Errorf("An error occurred: %s", err)
 		return
 	}
 	if len(documents) == 0 {
-		log.Panicln("No matches for", filename)
+		log.Errorf("No matches for search string %s", filename)
 		return
 	}
 	if len(documents) > 1 {
-		fmt.Println("Multiple files found. Please select from:")
+		fmt.Printf("%d files found. Please select from:\n", len(documents))
 		for index, element := range documents {
+			index++
 			fmt.Println(strconv.Itoa(index) + ": " + element.FileName)
 		}
-		var selection string
+		selection = -1
 		fmt.Scanln(&selection)
-		documentselection, err = strconv.Atoi(selection)
-		if err != nil {
-			log.Error("Please pass a number back for selection")
-			return
+		for (selection < 1 || selection > len(documents)) {
+			log.Errorf("%d is out of range of the length of choices", selection)
+			fmt.Scanln(&selection)
 		}
 	}
 
-	document := documents[documentselection]
+	document := documents[selection-1]
 	p.writeFile(document)
+	fmt.Printf("Sucessfully downloaded file with string: %s\n", filename)
 }
