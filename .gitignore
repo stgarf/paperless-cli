@@ -1,4 +1,5 @@
-# VS Code workspace
+# VS Code workspace, Goland
 *.code-workspace
+*.idea
 *.swp
 bin/
