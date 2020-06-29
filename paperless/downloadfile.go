@@ -61,7 +61,7 @@ func (p Paperless) DownloadFiles(filename string) {
 		}
 		selection = -1
 		fmt.Scanln(&selection)
-		for (selection < 1 || selection > len(documents)) {
+		for selection < 1 || selection > len(documents) {
 			log.Errorf("%d is out of range of the length of choices", selection)
 			fmt.Scanln(&selection)
 		}
