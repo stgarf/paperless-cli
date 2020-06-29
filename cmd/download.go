@@ -21,7 +21,6 @@ var downloadCmd = &cobra.Command{
 		if viper.ConfigFileUsed() == "" {
 			fmt.Println("No configuration file found! Try 'config create'")
 		} else {
-			fmt.Println(PaperInst)
 			for index := range args {
 				PaperInst.DownloadFiles(args[index])
 			}
